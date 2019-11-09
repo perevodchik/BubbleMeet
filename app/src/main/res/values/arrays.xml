@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="gender">
+        <item>Man</item>
+        <item>Woman</item>
+    </array>
+    <array name="lookingForChoice">
+        <item>Long term</item>
+        <item>Dating</item>
+        <item>For play</item>
+        <item>Just friendship</item>
+    </array>
+    <array name="age">
+        <item>17-25</item>
+        <item>26-30</item>
+        <item>31-35</item>
+        <item>36-40</item>
+        <item>41-45</item>
+        <item>46-50</item>
+        <item>51-more</item>
+    </array>
+    <array name="location">
+        <item>1 km</item>
+        <item>5 km</item>
+        <item>10 km</item>
+        <item>50 km</item>
+        <item>all area</item>
+    </array>
+    <array name="eye">
+        <item>Amber</item>
+        <item>Blue</item>
+        <item>Brown</item>
+        <item>Green</item>
+        <item>Hazel</item>
+        <item>Gray</item>
+        <item>Red an violet</item>
+        <item>Spectrum of eye color</item>
+    </array>
+    <array name="height">
+        <item>120hght</item>
+        <item>150hght</item>
+        <item>180hght</item>
+        <item>210hght</item>
+        <item>No matter</item>
+    </array>
+    <array name="smoking">
+        <item>Yes</item>
+        <item>No</item>
+        <item>No matter</item>
+    </array>
+    <array name="married">
+        <item>Yes</item>
+        <item>No</item>
+        <item>No matter</item>
+    </array>
+    <array name="children">
+        <item>Yes</item>
+        <item>No</item>
+        <item>No matter</item>
+    </array>
+    <array name="loveToCook">
+        <item>Yes</item>
+        <item>No</item>
+        <item>No matter</item>
+    </array>
+    <array name="yesNo">
+        <item>Yes</item>
+        <item>No</item>
+    </array>
+</resources>

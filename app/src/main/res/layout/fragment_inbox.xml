@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp">
+
+    <SearchView
+        android:id="@+id/inbox_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:autofillHints="@string/search_people"
+        android:background="@drawable/search_view_inbox_background"
+        android:ems="10"
+        android:hint="@string/search_people"
+        android:inputType="textPersonName"
+        android:textColor="@color/colorGrey4"
+        android:textColorHint="@color/colorGrey1"
+        tools:ignore="UnusedAttribute" />
+
+    <TextView
+        android:id="@+id/inbox_filter0"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/today"
+        android:textColor="@color/colorGrey4"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/inbox_filter1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/yesterday"
+        android:textColor="@color/colorGrey4"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/inbox_filter2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/two_days"
+        android:textColor="@color/colorGrey4"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/inbox_filter3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/later"
+        android:textColor="@color/colorGrey4"
+        android:textSize="16sp" />
+
+    <ListView
+        android:id="@+id/chats_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        tools:ignore="NestedScrolling" />
+</LinearLayout>

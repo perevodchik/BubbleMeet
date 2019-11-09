@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/user_preview_avatar_background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/preview_profile_background"
+        android:src="@drawable/profile_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="-50dp" />
+
+    <com.sackcentury.shinebuttonlib.ShineButton
+        android:id="@+id/shine_button"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_centerInParent="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:src="@android:color/darker_gray"
+        android:visibility="invisible"
+        app:allow_random_color="false"
+        app:big_shine_color="#ff6666"
+        app:btn_color="@android:color/darker_gray"
+        app:btn_fill_color="#ff6666"
+        app:click_animation_duration="200"
+        app:enable_flashing="false"
+        app:layout_constraintBottom_toBottomOf="@+id/user_preview_avatar_background"
+        app:layout_constraintEnd_toEndOf="@+id/user_preview_avatar_background"
+        app:layout_constraintStart_toStartOf="@+id/user_preview_avatar_background"
+        app:layout_constraintTop_toTopOf="@+id/user_preview_avatar_background"
+        app:shine_animation_duration="1500"
+        app:shine_count="8"
+        app:shine_distance_multiple="1.5"
+        app:shine_turn_angle="10"
+        app:small_shine_color="@color/colorGray"
+        app:small_shine_offset_angle="20" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/user_profile_avatar"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
+        android:layout_marginBottom="100dp"
+        android:visibility="invisible"
+        android:background="@drawable/preview_user_avatar_background"
+        app:layout_constraintBottom_toBottomOf="@+id/user_preview_avatar_background"
+        app:layout_constraintEnd_toStartOf="@+id/user_preview_avatar_background"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/user_preview_avatar_background" />
+
+
+    <ImageView
+        android:id="@+id/like_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:contentDescription="@string/button_like"
+        android:src="@drawable/likes_button_profile"
+        android:visibility="invisible"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_preview_avatar_background"
+        tools:ignore="MissingConstraints" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toStartOf="@+id/message_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/like_button"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="0dp">
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/message_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:contentDescription="@string/button_message"
+        android:src="@drawable/messages_profile"
+        android:visibility="invisible"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_preview_avatar_background"
+        tools:ignore="MissingConstraints" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/profile_preview_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/like_button"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/preview_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/username"
+        android:textColor="@color/colorGrey3"
+        android:textSize="18sp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/message_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/like_button"
+        app:layout_constraintTop_toBottomOf="@+id/user_preview_avatar_background" />
+
+    <TextView
+        android:id="@+id/preview_year_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/year_city"
+        android:textColor="@color/colorGrey3"
+        android:textSize="14sp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/message_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/like_button"
+        app:layout_constraintTop_toBottomOf="@+id/preview_user_name" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
