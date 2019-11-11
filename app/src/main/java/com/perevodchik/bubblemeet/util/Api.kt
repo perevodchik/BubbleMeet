@@ -1,5 +1,6 @@
 package com.perevodchik.bubblemeet.util
 
+import android.app.Activity
 import android.content.Context
 import com.perevodchik.bubblemeet.data.model.ChatItem
 import com.perevodchik.bubblemeet.data.model.Message
@@ -7,6 +8,7 @@ import com.perevodchik.bubblemeet.data.model.Profile
 import com.perevodchik.bubblemeet.data.model.UserData
 import io.reactivex.Single
 import okhttp3.MediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -22,6 +24,48 @@ class Api() {
 
     constructor(_ctx: Context?) : this() {
         this.context = _ctx
+    }
+
+    fun register(isFull: Boolean, activity: Activity): Single<Response<ResponseBody>> {
+        val api: IApi = r.create(IApi::class.java)
+        val profile: Profile = UserInstance.profile
+        val avatar =
+            RequestBody.create(MediaType.parse("multipart/form-data"), UserInstance.userAvatar
+            )
+        val location = Location.getCoordinates(activity).toString()
+
+        if(isFull) {
+            return api.registerFull(name = RequestBody.create(MediaType.parse(textPlain), profile.name),
+                gender = RequestBody.create(MediaType.parse(textPlain), profile.gender),
+                age = RequestBody.create(MediaType.parse(textPlain), profile.age.toString()),
+                email = RequestBody.create(MediaType.parse(textPlain), profile.email),
+                password = RequestBody.create(MediaType.parse(textPlain), UserInstance.password),
+                avatarFull = MultipartBody.Part.createFormData("avatarFull", profile.login, avatar),
+                avatarSmall = MultipartBody.Part.createFormData("avatarSmall", profile.login, avatar),
+                height = RequestBody.create(MediaType.parse(textPlain), UserInstance.password),
+                city = RequestBody.create(MediaType.parse(textPlain), UserInstance.password),
+                cook = RequestBody.create(MediaType.parse(textPlain), UserInstance.password),
+                login = RequestBody.create(MediaType.parse(textPlain), profile.login),
+                smoking = RequestBody.create(MediaType.parse(textPlain), profile.smoking.toString()),
+                marred = RequestBody.create(MediaType.parse(textPlain), profile.marred.toString()),
+                looking = RequestBody.create(MediaType.parse(textPlain), profile.looking),
+                hobbes = RequestBody.create(MediaType.parse(textPlain), profile.hobbes),
+                children = RequestBody.create(MediaType.parse(textPlain), profile.children.toString()),
+                location = RequestBody.create(MediaType.parse(textPlain), location)
+                )
+        }
+        else {
+            return api.register(name = RequestBody.create(MediaType.parse(textPlain), profile.name),
+                gender = RequestBody.create(MediaType.parse(textPlain), profile.gender),
+                age = RequestBody.create(MediaType.parse(textPlain), profile.age.toString()),
+                email = RequestBody.create(MediaType.parse(textPlain), profile.email),
+                password = RequestBody.create(MediaType.parse(textPlain), UserInstance.password),
+                avatarFull = MultipartBody.Part.createFormData("avatarFull", profile.login, avatar),
+                avatarSmall = MultipartBody.Part.createFormData("avatarSmall", profile.login, avatar),
+                login = RequestBody.create(MediaType.parse(textPlain), profile.login),
+                city = RequestBody.create(MediaType.parse(textPlain), profile.city),
+                location = RequestBody.create(MediaType.parse(textPlain), location))
+        }
     }
 
     fun login(email: String, password: String): Single<Response<ResponseBody>> {

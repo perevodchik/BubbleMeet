@@ -1,10 +1,12 @@
 package com.perevodchik.bubblemeet.util
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Point
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -33,4 +35,12 @@ fun View.getPoint(): Point {
 
 fun Point.distance(p: Point): Float {
     return sqrt((p.x - x + 0.0).pow(2) + (p.y - y + 0.0).pow(2)).toFloat()
+}
+
+fun View.setTint(colorId: Int) {
+    ViewCompat.setBackgroundTintList(
+        this, ColorStateList.valueOf(
+            resources.getColor(colorId)
+        )
+    )
 }

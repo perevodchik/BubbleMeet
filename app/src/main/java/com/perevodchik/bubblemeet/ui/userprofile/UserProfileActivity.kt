@@ -45,17 +45,17 @@ class UserProfileActivity : AppCompatActivity() {
             startActivity(Intent(this, PreloadActivity::class.java))
         }
 
-        list.add(profile?.looking ?: "")
-        list.add(if(profile?.smoking == 1) "Smoking" else "No smoking")
-        list.add(profile?.height.toString())
-        list.add(profile?.eyeColor ?: "")
-        list.add(if(profile?.marred == 1) "Married" else "Not married")
-        list.add(if(profile?.smoking == 1) "Have children" else "No children")
-        list.add(if(profile?.smoking == 1) "Love to cook" else "No cooking")
+        list.add(profile.looking)
+        list.add(if(profile.smoking == 1) "Smoking" else "No smoking")
+        list.add(profile.height.toString())
+        list.add(profile.eyeColor)
+        list.add(if(profile.marred == 1) "Married" else "Not married")
+        list.add(if(profile.smoking == 1) "Have children" else "No children")
+        list.add(if(profile.smoking == 1) "Love to cook" else "No cooking")
 
-        findViewById<TextView>(R.id.profile_user_name).text = (profile?.name + " " + profile?.last_name)
-        findViewById<TextView>(R.id.profile_biography).text = profile?.hobbes
-        findViewById<TextView>(R.id.profile_year_country).text = (profile?.age.toString() + ", " + profile?.city)
+        findViewById<TextView>(R.id.profile_user_name).text = (profile.name + " " + profile.last_name)
+        findViewById<TextView>(R.id.profile_biography).text = profile.hobbes
+        findViewById<TextView>(R.id.profile_year_country).text = (profile.age.toString() + ", " + profile.city)
 
         R.array.gender
         for(s in list) {
@@ -74,10 +74,10 @@ class UserProfileActivity : AppCompatActivity() {
             this.finish()
         }
 
-        loadImg("${Values.imgUrl}/${UserInstance.profile?.avatarFull}", R.id.profile_user_avatar)
-        loadImg("${Values.imgUrl}/${UserInstance.profile?.photo?.get(0)}", R.id.user_photo_0)
-        loadImg("${Values.imgUrl}/${UserInstance.profile?.photo?.get(1)}", R.id.user_photo_1)
-        loadImg("${Values.imgUrl}/${UserInstance.profile?.photo?.get(2)}", R.id.user_photo_2)
+        loadImg("${Values.imgUrl}/${profile.avatarFull}", R.id.profile_user_avatar)
+        loadImg("${Values.imgUrl}/${profile.photo[0]}", R.id.user_photo_0)
+        loadImg("${Values.imgUrl}/${profile.photo[1]}", R.id.user_photo_1)
+        loadImg("${Values.imgUrl}/${profile.photo[2]}", R.id.user_photo_2)
 
     }
 

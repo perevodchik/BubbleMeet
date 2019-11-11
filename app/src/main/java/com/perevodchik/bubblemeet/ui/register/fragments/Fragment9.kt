@@ -10,8 +10,15 @@ import com.perevodchik.bubblemeet.R
 import com.perevodchik.bubblemeet.ui.register.IRegisterFragment
 
 class Fragment9: Fragment(), IRegisterFragment {
-    override fun setData() {
 
+    override fun validate(): Boolean {
+        return false
+    }
+
+    override fun showDialog() {
+    }
+
+    override fun setData() {
     }
 
     @SuppressLint("InflateParams")

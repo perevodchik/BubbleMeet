@@ -2,6 +2,7 @@ package com.perevodchik.bubblemeet.ui.register
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -12,8 +13,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.perevodchik.bubblemeet.R
+import com.perevodchik.bubblemeet.util.UserInstance
 
-class FragmentRegister(): DialogFragment() {
+class FragmentRegister: DialogFragment() {
     private var nextBtn: Button? = null
     private var closeBtn: ImageView? = null
     private var registerFragmentAdapter: RegisterFragmentPagerAdapter? = null
@@ -35,11 +37,8 @@ class FragmentRegister(): DialogFragment() {
         registerFragmentAdapter = RegisterFragmentPagerAdapter(childFragmentManager)
         registerViewPager!!.setOnTouchListener { _, _ -> true }
         registerViewPager!!.adapter = registerFragmentAdapter
-        registerViewPager!!.addOnPageChangeListener(object: ViewPager.OnPageChangeListener{
-
+        registerViewPager!!.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageSelected(position: Int) {
-                // tut set on 3 or 9 page user latlng to profile and send register data to server
-                println("select page ${registerViewPager!!.currentItem}")
             }
 
             override fun onPageScrollStateChanged(state: Int) {
@@ -61,18 +60,16 @@ class FragmentRegister(): DialogFragment() {
             activity!!.finish()
         }
 
-        nextBtn!!.setOnClickListener{
-            println("current item ${registerViewPager!!.currentItem}")
-            registerViewPager!!.currentItem = ++registerViewPager!!.currentItem
+        nextBtn!!.setOnClickListener {
+            if((registerFragmentAdapter!!.getItem(registerViewPager!!.currentItem) as IRegisterFragment).validate()) {
+                (registerFragmentAdapter!!.getItem(registerViewPager!!.currentItem) as IRegisterFragment).setData()
+                showNext()
+            }
         }
-
-
-
         return v
     }
 
-
-    private fun showNext() {
+    fun showNext() {
         registerViewPager!!.currentItem = ++registerViewPager!!.currentItem
     }
 

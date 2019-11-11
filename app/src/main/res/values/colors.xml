@@ -21,5 +21,7 @@
     <color name="colorLightPink">#855d94</color>
     <color name="colorLightPurple">#6d657d</color>
     <color name="colorLightPurple1">#33184f</color>
+    <color name="colorBlack">#0b0b0c</color>
+    <color name="transparent">@android:color/transparent</color>
 </resources>
 
