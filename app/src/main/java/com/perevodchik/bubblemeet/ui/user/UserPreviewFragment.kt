@@ -1,8 +1,10 @@
 package com.perevodchik.bubblemeet.ui.user
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,17 +19,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.perevodchik.bubblemeet.R
 import com.perevodchik.bubblemeet.data.adapter.TemporaryAdapter
 import com.perevodchik.bubblemeet.data.model.UserData
+import com.perevodchik.bubblemeet.ui.filter.FilterActivity
 import com.perevodchik.bubblemeet.ui.mainmenu.MainActivity
 import com.perevodchik.bubblemeet.ui.mainmenu.inbox.ChatFragment
 import com.perevodchik.bubblemeet.ui.mainmenu.inbox.InboxFragment
+import com.perevodchik.bubblemeet.ui.mainmenu.presenter.LikesPresenter
 import com.perevodchik.bubblemeet.util.OnSwipeListener
+import com.perevodchik.bubblemeet.util.UserInstance
 import com.perevodchik.bubblemeet.util.Values
 import com.sackcentury.shinebuttonlib.ShineButton
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
-class UserPreviewFragment(_userData: UserData, _fm: FragmentManager): Fragment() {
-    private val userData: UserData = _userData
+class UserPreviewFragment(_userData: UserData, _fm: FragmentManager) : Fragment() {
+    private var userData: UserData = _userData
     private val presenter = UserPreviewPresenter(this)
     private val fm: FragmentManager = _fm
     private lateinit var userImg: CircleImageView
@@ -40,9 +45,11 @@ class UserPreviewFragment(_userData: UserData, _fm: FragmentManager): Fragment()
     private lateinit var adapter: TemporaryAdapter
     private lateinit var shineButton: ShineButton
     private lateinit var toggleBtn: ImageView
+    private var isUserFavorite = false
+    private var flag: Int = 0
 
     companion object {
-        fun newInstance() = InboxFragment()
+        fun newInstance(_userData: UserData, _fm: FragmentManager) = UserPreviewFragment(_userData, _fm)
     }
 
     @SuppressLint("SetTextI18n")
@@ -53,7 +60,6 @@ class UserPreviewFragment(_userData: UserData, _fm: FragmentManager): Fragment()
         return inflater.inflate(R.layout.fragment_user_profile, container, false)
     }
 
-    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -70,34 +76,79 @@ class UserPreviewFragment(_userData: UserData, _fm: FragmentManager): Fragment()
         toggleBtn.visibility = View.VISIBLE
         toggleBtn.setImageDrawable(activity!!.resources.getDrawable(R.drawable.ic_back, null))
         toggleBtn.setOnClickListener {
+            activity!!.findViewById<ImageView>(R.id.toggle).visibility = View.INVISIBLE
             activity!!.supportFragmentManager.popBackStack()
         }
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
         recyclerView.layoutManager = layoutManager
-        adapter = TemporaryAdapter(_ctx = activity as MainActivity?, _fm = fragmentManager, _list = mutableListOf())
+        adapter = TemporaryAdapter(
+            _ctx = activity as MainActivity?,
+            _fm = fragmentManager,
+            _list = mutableListOf()
+        )
 
         presenter.getTemporary()
-
         recyclerView.adapter = adapter
 
+        init(userData)
+
+        val animationAlphaBubbles = AnimationUtils.loadAnimation(context, R.anim.alpha_profile)
+        animationAlphaBubbles.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {}
+
+            override fun onAnimationEnd(animation: Animation) {
+                val animationAlphaOtherViews =
+                    AnimationUtils.loadAnimation(context, R.anim.alpha_profile)
+
+                nameTextView.animation = animationAlphaOtherViews
+                oldCountryTextView.animation = animationAlphaOtherViews
+                likeBtn.animation = animationAlphaOtherViews
+                sendMailBtn.animation = animationAlphaOtherViews
+                userImg.animation = animationAlphaOtherViews
+                recyclerView.animation = animationAlphaOtherViews
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {}
+        })
+        avatarBackground.animation = animationAlphaBubbles
+        animationAlphaBubbles.start()
+    }
+
+    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
+    private fun init(u: UserData) {
+        userData = u
         nameTextView.text = userData.name
         oldCountryTextView.text = "${userData.age}, ${userData.city}"
+
+        isUserFavorite = presenter.isUserInFavorite(userData)
+        if(isUserFavorite)
+            likeBtn.setImageDrawable(resources.getDrawable(R.drawable.likes_button_boom, null))
+        else
+            likeBtn.setImageDrawable(resources.getDrawable(R.drawable.likes_button_profile, null))
+
         val anim = AnimationUtils.loadAnimation(context, R.anim.scale_like)
-        anim.setAnimationListener(object: Animation.AnimationListener {
+        val animBack = AnimationUtils.loadAnimation(context, R.anim.scale_like_back)
+        anim.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationRepeat(animation: Animation?) {}
 
             override fun onAnimationEnd(animation: Animation?) {
-                likeBtn.alpha = 1.0F
-                likeBtn.setImageDrawable(resources.getDrawable(R.drawable.likes_button_boom, null))
+                likeBtn.startAnimation(animBack)
             }
 
             override fun onAnimationStart(animation: Animation?) {}
         })
 
         likeBtn.setOnClickListener {
-            presenter.addFavorite(userData.id)
-            likeBtn.startAnimation(anim)
+            isUserFavorite = !isUserFavorite
+            if(isUserFavorite)
+                likeBtn.setImageDrawable(resources.getDrawable(R.drawable.likes_button_boom, null))
+            else
+                likeBtn.setImageDrawable(resources.getDrawable(R.drawable.likes_button_profile, null))
+            flag = 1
+
+            if(isUserFavorite)
+                likeBtn.startAnimation(anim)
         }
 
         sendMailBtn.setOnClickListener {
@@ -107,7 +158,7 @@ class UserPreviewFragment(_userData: UserData, _fm: FragmentManager): Fragment()
                 .commit()
         }
 
-        userImg.setOnTouchListener(object: OnSwipeListener(context!!) {
+        userImg.setOnTouchListener(object : OnSwipeListener(context!!) {
             override fun onSwipeTop() {
                 super.onSwipeTop()
                 activity?.supportFragmentManager?.popBackStack()
@@ -149,32 +200,28 @@ class UserPreviewFragment(_userData: UserData, _fm: FragmentManager): Fragment()
         })
 
         try {
-            Picasso.with(view.context)
+            Picasso.with(view?.context)
                 .load("${Values.imgUrl}/${userData.avatarFull}")
                 .into(userImg)
         } catch (e: Exception) {
             println(e.localizedMessage)
         }
+    }
 
-        val animationAlphaBubbles = AnimationUtils.loadAnimation(context, R.anim.alpha_profile)
-        animationAlphaBubbles.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {}
+    override fun onStop() {
+        super.onStop()
+        if(flag == 0)
+            return
 
-            override fun onAnimationEnd(animation: Animation) {
-                val animationAlphaOtherViews = AnimationUtils.loadAnimation(context, R.anim.alpha_profile)
-
-                nameTextView.animation = animationAlphaOtherViews
-                oldCountryTextView.animation = animationAlphaOtherViews
-                likeBtn.animation = animationAlphaOtherViews
-                sendMailBtn.animation = animationAlphaOtherViews
-                userImg.animation = animationAlphaOtherViews
-                recyclerView.animation = animationAlphaOtherViews
+        when(isUserFavorite) {
+            true -> {
+                presenter.addFavorite(userData)
             }
-
-            override fun onAnimationRepeat(animation: Animation) {}
-        })
-        avatarBackground.animation = animationAlphaBubbles
-        animationAlphaBubbles.start()
+            false -> {
+                presenter.deleteFavorite(userData)
+                UserInstance.removeLikes(userData)
+            }
+        }
     }
 
     fun boomAnimation(isRight: Boolean) {
@@ -190,17 +237,14 @@ class UserPreviewFragment(_userData: UserData, _fm: FragmentManager): Fragment()
             }, 750)
         } else {
             Handler().postDelayed({
-                /*fm.popBackStack()
-                val transaction = fm.beginTransaction()
-                val profileFragment = UserPreviewFragment()
-                if (this@ProfilePreviewFragment.mCurrentNumber + 1 != this@ProfilePreviewFragment.mUsers.size) {
-                    profileFragment.setUser(this@ProfilePreviewFragment.mCurrentNumber + 1, this@ProfilePreviewFragment.mUsers)
-                } else {
-                    profileFragment.setUsers(this@ProfilePreviewFragment.mUsers)
+                for(c in 0 until UserInstance.allUsers.size) {
+                    val ud = UserInstance.allUsers[c]
+                    if(ud.id == userData.id)
+                        if(c + 1 < UserInstance.allUsers.size) {
+                            init(UserInstance.allUsers[c + 1])
+                            break
+                        }
                 }
-                transaction.replace(R.id.container, profileFragment)
-                transaction.addToBackStack(null)
-                transaction.commit()*/
             }, 750)
         }
     }

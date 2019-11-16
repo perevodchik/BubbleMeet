@@ -1,6 +1,5 @@
 package com.perevodchik.bubblemeet.ui.mainmenu
 
-import User
 import android.content.Intent
 import android.view.View
 import android.widget.ImageView
@@ -12,6 +11,7 @@ import com.perevodchik.bubblemeet.util.Presenter
 import com.perevodchik.bubblemeet.R
 import com.perevodchik.bubblemeet.util.UserInstance
 import com.perevodchik.bubblemeet.data.model.Profile
+import com.perevodchik.bubblemeet.data.model.UserData
 import com.perevodchik.bubblemeet.ui.filter.FilterActivity
 import com.perevodchik.bubblemeet.ui.mainmenu.bubble.BubbleFragment
 import com.perevodchik.bubblemeet.ui.mainmenu.fragment.*
@@ -31,7 +31,7 @@ class MainPresenter(_ctx: MainActivity): View.OnClickListener,
     Presenter {
     private val context: MainActivity = _ctx
     private val api: Api = Api(context)
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
+    private val disposable: CompositeDisposable = CompositeDisposable()
     private var fm: FragmentManager
     private var matches: ImageView
     private var likes: ImageView
@@ -43,7 +43,8 @@ class MainPresenter(_ctx: MainActivity): View.OnClickListener,
     private lateinit var fragment: Fragment
 
     init {
-        fetchUser()
+        //fetchAllUsers()
+        //fetchUser()
         fm = context.supportFragmentManager
         matches = context.findViewById(R.id.matches_item)
         likes = context.findViewById(R.id.likes_item)
@@ -63,13 +64,13 @@ class MainPresenter(_ctx: MainActivity): View.OnClickListener,
     }
 
     private fun fetchUser() {
-        compositeDisposable
+        disposable
             .add(api.getUser().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object: DisposableSingleObserver<Response<Profile>>() {
             override fun onSuccess(r: Response<Profile>) {
-                UserInstance.profile = r.body()
-                val img = "${Values.imgUrl}/${UserInstance.profile?.avatarSmall}"
+                UserInstance.profile = r.body() ?: Profile()
+                val img = "${Values.imgUrl}/${UserInstance.profile.avatarSmall}"
                 Picasso.with(context).load(img).placeholder(R.drawable.background_loading).into(profileAvatar)
             }
             override fun onError(e: Throwable) {
@@ -78,83 +79,104 @@ class MainPresenter(_ctx: MainActivity): View.OnClickListener,
         }))
     }
 
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.matches_item -> {
-                fragment = MatchesFragment.newInstance()
-                resetBottomMenuIcons()
-                matches.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_matches_active
-                    )
-                )
-                fm.beginTransaction()
-                    .replace(R.id.container, fragment)
-                    .addToBackStack(null)
-                    .commit()
-            }
-            R.id.likes_item -> {
-                fragment = LikesFragment.newInstance()
-                resetBottomMenuIcons()
-                likes.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_likes_active
-                    )
-                )
-                fm.beginTransaction()
-                    .replace(R.id.container, fragment)
-                    .addToBackStack(null)
-                    .commit()
-            }
-            R.id.menu_item -> {
-                fragment = BubbleFragment.newInstance()
-                resetBottomMenuIcons()
-                fm.beginTransaction()
-                    .replace(R.id.container, fragment)
-                    .addToBackStack(null)
-                    .commit()
+    private fun fetchAllUsers() {
+        disposable.addAll(
+            api.getUsers()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<Response<List<UserData>>>() {
+                    override fun onSuccess(r: Response<List<UserData>>) {
+                        UserInstance.allUsers.addAll(r.body() ?: listOf())
+                    }
+                    override fun onError(e: Throwable) {
+                    }
 
-                toggle.visibility = View.VISIBLE
-                toggle.setImageDrawable(context.getDrawable(R.drawable.filter_btn))
-                toggle.setOnClickListener { context.startActivity(Intent(context, FilterActivity::class.java)) }
-            }
-            R.id.watchers_item -> {
-                fragment = WatchersFragment.newInstance()
-                resetBottomMenuIcons()
-                watchers.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_watchers_active
-                    )
-                )
-                fm.beginTransaction()
-                    .replace(R.id.container, fragment)
-                    .addToBackStack(null)
-                    .commit()
-            }
-            R.id.inbox_item -> {
-                fragment = InboxFragment.newInstance()
-                resetBottomMenuIcons()
-                inbox.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        context,
-                        R.drawable.ic_inbox_active
-                    )
-                )
-                fm.beginTransaction()
-                    .replace(R.id.container, fragment)
-                    .addToBackStack(null)
-                    .commit()
-            }
-            R.id.toggle -> {
-                context.startActivity(Intent(context, FilterActivity::class.java))
-            }
-            R.id.main_menu_user_avatar -> {
-                context.startActivity(Intent(context, UserProfileActivity::class.java))
-            }
-        }
+                })
+        )
+    }
+
+    override fun onClick(view: View) {
+//        when (view.id) {
+//            R.id.matches_item -> {
+//                fragment = MatchesFragment.newInstance()
+//                resetBottomMenuIcons()
+//                context.flag = 1
+//                matches.setImageDrawable(
+//                    ContextCompat.getDrawable(
+//                        context,
+//                        R.drawable.ic_matches_active
+//                    )
+//                )
+//                fm.beginTransaction()
+//                    .replace(R.id.container, fragment)
+//                    .addToBackStack(null)
+//                    .commit()
+//            }
+//            R.id.likes_item -> {
+//                fragment = LikesFragment.newInstance()
+//                resetBottomMenuIcons()
+//                context.flag = 1
+//                likes.setImageDrawable(
+//                    ContextCompat.getDrawable(
+//                        context,
+//                        R.drawable.ic_likes_active
+//                    )
+//                )
+//                fm.beginTransaction()
+//                    .replace(R.id.container, fragment)
+//                    .addToBackStack(null)
+//                    .commit()
+//            }
+//            R.id.menu_item -> {
+//                fragment = BubbleFragment.newInstance()
+//                resetBottomMenuIcons()
+//                context.flag = 0
+//                fm.beginTransaction()
+//                    .replace(R.id.container, fragment)
+//                    .addToBackStack(null)
+//                    .commit()
+//
+//                toggle.visibility = View.VISIBLE
+//                toggle.setImageDrawable(context.getDrawable(R.drawable.filter_btn))
+//                toggle.setOnClickListener { context.startActivityForResult(Intent(context, FilterActivity::class.java), 33) }
+//            }
+//            R.id.watchers_item -> {
+//                fragment = WatchersFragment.newInstance()
+//                resetBottomMenuIcons()
+//                context.flag = 1
+//                watchers.setImageDrawable(
+//                    ContextCompat.getDrawable(
+//                        context,
+//                        R.drawable.ic_watchers_active
+//                    )
+//                )
+//                fm.beginTransaction()
+//                    .replace(R.id.container, fragment)
+//                    .addToBackStack(null)
+//                    .commit()
+//            }
+//            R.id.inbox_item -> {
+//                fragment = InboxFragment.newInstance()
+//                resetBottomMenuIcons()
+//                context.flag = 1
+//                inbox.setImageDrawable(
+//                    ContextCompat.getDrawable(
+//                        context,
+//                        R.drawable.ic_inbox_active
+//                    )
+//                )
+//                fm.beginTransaction()
+//                    .replace(R.id.container, fragment)
+//                    .addToBackStack(null)
+//                    .commit()
+//            }
+//            R.id.toggle -> {
+//                context.startActivityForResult(Intent(context, FilterActivity::class.java), 33)
+//            }
+//            R.id.main_menu_user_avatar -> {
+//                context.startActivity(Intent(context, UserProfileActivity::class.java))
+//            }
+//        }
     }
 
     private fun resetBottomMenuIcons() {

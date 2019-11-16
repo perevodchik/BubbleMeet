@@ -33,12 +33,6 @@ class LoginActivity : AppCompatActivity() {
         loginButton = findViewById(R.id.login)
         loginLogo = findViewById(R.id.login_logo)
 
-        /*emailEditText.afterTextChanged {
-        }
-
-        forgotTextView.apply {
-        }*/
-
         presenter = LoginPresenter(this)
         loginButton.setOnClickListener { presenter!!.onClick(loginButton) }
 

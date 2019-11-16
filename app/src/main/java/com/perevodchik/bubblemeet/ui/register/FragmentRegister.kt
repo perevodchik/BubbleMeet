@@ -1,6 +1,7 @@
 package com.perevodchik.bubblemeet.ui.register
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,7 +14,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import com.perevodchik.bubblemeet.R
+import com.perevodchik.bubblemeet.util.Api
 import com.perevodchik.bubblemeet.util.UserInstance
+import io.reactivex.disposables.CompositeDisposable
 
 class FragmentRegister: DialogFragment() {
     private var nextBtn: Button? = null
@@ -21,6 +24,7 @@ class FragmentRegister: DialogFragment() {
     private var registerFragmentAdapter: RegisterFragmentPagerAdapter? = null
     private var registerTabLayout: TabLayout? = null
     private var registerViewPager: ViewPager? = null
+    private lateinit var presenter: RegisterPresenter
 
     @SuppressLint("InflateParams", "ClickableViewAccessibility")
     override fun onCreateView(
@@ -28,31 +32,16 @@ class FragmentRegister: DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        presenter = RegisterPresenter(activity!!)
         val v = inflater.inflate(R.layout.fragment_register, null)
-        this.nextBtn = v.findViewById(R.id.buttonNext)
-        this.closeBtn = v.findViewById(R.id.buttonClose)
-        this.registerTabLayout = v.findViewById(R.id.tab_layout)
-        this.registerViewPager = v.findViewById(R.id.profile_viewpager)
+        nextBtn = v.findViewById(R.id.buttonNext)
+        closeBtn = v.findViewById(R.id.buttonClose)
+        registerTabLayout = v.findViewById(R.id.tab_layout)
+        registerViewPager = v.findViewById(R.id.profile_viewpager)
 
         registerFragmentAdapter = RegisterFragmentPagerAdapter(childFragmentManager)
-        registerViewPager!!.setOnTouchListener { _, _ -> true }
+        registerViewPager!!.setOnTouchListener { _, _ -> false }
         registerViewPager!!.adapter = registerFragmentAdapter
-        registerViewPager!!.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageSelected(position: Int) {
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-
-            }
-
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-
-            }
-        })
 
         registerTabLayout!!.setupWithViewPager(registerViewPager)
         closeBtn!!.setOnClickListener {
@@ -61,8 +50,15 @@ class FragmentRegister: DialogFragment() {
         }
 
         nextBtn!!.setOnClickListener {
+            (registerFragmentAdapter!!.getItem(registerViewPager!!.currentItem) as IRegisterFragment).setData()
+            val index = registerViewPager!!.currentItem
+            if(index == 3) {
+                presenter.register(false)
+            }
+            if(index == 9) {
+                presenter.register(true)
+            }
             if((registerFragmentAdapter!!.getItem(registerViewPager!!.currentItem) as IRegisterFragment).validate()) {
-                (registerFragmentAdapter!!.getItem(registerViewPager!!.currentItem) as IRegisterFragment).setData()
                 showNext()
             }
         }
@@ -73,4 +69,15 @@ class FragmentRegister: DialogFragment() {
         registerViewPager!!.currentItem = ++registerViewPager!!.currentItem
     }
 
+    override fun onResume() {
+        val attributes = dialog?.window?.attributes
+        attributes?.height = 1400
+        dialog?.window?.attributes = attributes
+        super.onResume()
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        activity?.finish()
+    }
 }

@@ -1,5 +1,7 @@
 package com.perevodchik.bubblemeet.ui.filter
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -52,8 +54,18 @@ class FilterActivity : AppCompatActivity() {
     }
 
     fun useNavigate(view: View) {
+        val i = Intent()
         when(view.id) {
-            R.id.btn_set_filter -> { finish() }
+            R.id.btn_set_filter -> {
+                val str = ""
+                for(e in filters.entries) {
+                    str.plus("${e.key}=${e.value},")
+                }
+                i.putExtra("filter", str)
+
+                setResult(Activity.RESULT_OK, i)
+                finish()
+            }
             R.id.btn_close_filter -> { finish() }
         }
     }

@@ -1,7 +1,5 @@
 package com.perevodchik.bubblemeet.ui.mainmenu.presenter
 
-import android.widget.Toast
-import com.perevodchik.bubblemeet.data.model.HistoryUser
 import com.perevodchik.bubblemeet.data.model.UserData
 import com.perevodchik.bubblemeet.ui.mainmenu.fragment.WatchersFragment
 import com.perevodchik.bubblemeet.util.Api
@@ -32,7 +30,6 @@ class WatchersPresenter(_ctx: WatchersFragment) {
                     }
 
                     override fun onError(e: Throwable) {
-                        Toast.makeText(context.context, e.localizedMessage, Toast.LENGTH_LONG).show()
                     }
                 }))
     }

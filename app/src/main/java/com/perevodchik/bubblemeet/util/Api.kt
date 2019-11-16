@@ -1,6 +1,5 @@
 package com.perevodchik.bubblemeet.util
 
-import android.app.Activity
 import android.content.Context
 import com.perevodchik.bubblemeet.data.model.ChatItem
 import com.perevodchik.bubblemeet.data.model.Message
@@ -15,6 +14,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 
 class Api() {
     private val BASE_URL = "http://185.25.116.211:11000/"
@@ -26,13 +26,12 @@ class Api() {
         this.context = _ctx
     }
 
-    fun register(isFull: Boolean, activity: Activity): Single<Response<ResponseBody>> {
+    fun register(isFull: Boolean): Single<Response<ResponseBody>> {
         val api: IApi = r.create(IApi::class.java)
         val profile: Profile = UserInstance.profile
         val avatar =
-            RequestBody.create(MediaType.parse("multipart/form-data"), UserInstance.userAvatar
+                RequestBody.create(MediaType.parse("multipart/form-data"), UserInstance.userAvatar!!
             )
-        val location = Location.getCoordinates(activity).toString()
 
         if(isFull) {
             return api.registerFull(name = RequestBody.create(MediaType.parse(textPlain), profile.name),
@@ -51,7 +50,7 @@ class Api() {
                 looking = RequestBody.create(MediaType.parse(textPlain), profile.looking),
                 hobbes = RequestBody.create(MediaType.parse(textPlain), profile.hobbes),
                 children = RequestBody.create(MediaType.parse(textPlain), profile.children.toString()),
-                location = RequestBody.create(MediaType.parse(textPlain), location)
+                location = RequestBody.create(MediaType.parse(textPlain), profile.location)
                 )
         }
         else {
@@ -64,7 +63,7 @@ class Api() {
                 avatarSmall = MultipartBody.Part.createFormData("avatarSmall", profile.login, avatar),
                 login = RequestBody.create(MediaType.parse(textPlain), profile.login),
                 city = RequestBody.create(MediaType.parse(textPlain), profile.city),
-                location = RequestBody.create(MediaType.parse(textPlain), location))
+                location = RequestBody.create(MediaType.parse(textPlain), profile.location))
         }
     }
 
@@ -98,10 +97,10 @@ class Api() {
         return api.getUserFavorite(session)
     }
 
-    fun getFavoriteByMe(): Single<Response<List<UserData>>> {
+    fun getFavorite(): Single<Response<List<UserData>>> {
         val api: IApi = r.create(IApi::class.java)
         val session = UserInstance.session ?: ""
-        return api.getFavouriteByMe(session)
+        return api.getFavourite(session)
     }
 
     fun addHistory(historyId: Int): Single<ResponseBody> {
@@ -175,6 +174,21 @@ class Api() {
     fun getUsers(): Single<Response<List<UserData>>>{
         val api: IApi = r.create(IApi::class.java)
         return api.getUsers()
+    }
+
+    fun addPhoto(photo: File): Single<ResponseBody> {
+        val api: IApi = r.create(IApi::class.java)
+        val session = UserInstance.session ?: ""
+        val avatar = MultipartBody.Part.createFormData("file", UserInstance.profile.login, RequestBody.create(MediaType.parse("multipart/form-data"), photo))
+        return api.addPhoto(session, avatar)
+    }
+
+    fun deleteFavorite(id: Int): Single<ResponseBody> {
+        val api: IApi = r.create(IApi::class.java)
+        val session = UserInstance.session ?: ""
+        // RequestBody.create(MediaType.parse(textPlain), id.toString())
+//        session, RequestBody.create(MediaType.parse(textPlain),
+        return api.deleteFavorite(id.toString())
     }
 
     private fun getClient(baseUrl: String): Retrofit {

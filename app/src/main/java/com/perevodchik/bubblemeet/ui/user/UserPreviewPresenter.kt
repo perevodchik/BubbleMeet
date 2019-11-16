@@ -1,16 +1,22 @@
 package com.perevodchik.bubblemeet.ui.user
 
+import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.perevodchik.bubblemeet.R
+import com.perevodchik.bubblemeet.data.model.Favorite
 import com.perevodchik.bubblemeet.data.model.UserData
+import com.perevodchik.bubblemeet.ui.mainmenu.presenter.LikesPresenter
 import com.perevodchik.bubblemeet.util.Api
+import com.perevodchik.bubblemeet.util.UserInstance
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 
@@ -18,6 +24,19 @@ class UserPreviewPresenter(_ctx: UserPreviewFragment) {
     private val context: UserPreviewFragment = _ctx
     private val api: Api = Api()
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
+
+    fun isUserInFavorite(userData: UserData): Boolean {
+        var isFavoriteUser = false
+        Log.d("user ->", "start check")
+        for(u in UserInstance.userLikes) {
+            if(u.id_favorite == userData.id_favorite || u.id == userData.id) {
+                isFavoriteUser = true
+                Log.d("user -> $isFavoriteUser", u.toString())
+                break
+            }
+        }
+        return isFavoriteUser
+    }
 
     fun openFullProfileIfCan(userData: UserData, fm: FragmentManager) {
         compositeDisposable
@@ -56,9 +75,26 @@ class UserPreviewPresenter(_ctx: UserPreviewFragment) {
                 }))
     }
 
-    fun addFavorite(favoriteId: Int) {
+    fun addFavorite(userData: UserData) {
         compositeDisposable
-            .add(api.addFavorite(favoriteId).subscribeOn(Schedulers.io())
+            .add(api.addFavorite(userData.id).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object: DisposableSingleObserver<ResponseBody>() {
+                    override fun onSuccess(r: ResponseBody) {
+                        val json = Gson().fromJson(r.string(), JsonObject::class.java)
+                        userData.id_favorite = json.get("favorite").asJsonObject.get("id").asInt
+                        UserInstance.userLikes.add(userData)
+                    }
+                    override fun onError(e: Throwable) {
+                        e.printStackTrace()
+                        Toast.makeText(context.context, e.localizedMessage, Toast.LENGTH_LONG).show()
+                    }
+                }))
+    }
+
+    fun deleteFavorite(userData: UserData) {
+        compositeDisposable
+            .add(api.deleteFavorite(userData.id_favorite).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object: DisposableSingleObserver<ResponseBody>() {
                     override fun onSuccess(r: ResponseBody) {

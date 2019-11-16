@@ -10,11 +10,11 @@ import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
 
 class BubblePresenter {
-    private lateinit var ctx: BubbleFragment0
+    private lateinit var ctx: BubbleFragment
     private val api: Api = Api()
     private val disposable = CompositeDisposable()
 
-    fun setContext(_ctx: BubbleFragment0) {
+    fun setContext(_ctx: BubbleFragment) {
         ctx = _ctx
     }
 
@@ -28,7 +28,7 @@ class BubblePresenter {
                     list = r.body() ?: listOf()
                     Log.d("getUsers", r.message())
                     Log.d("getUsers", list.toString())
-                    ctx.setUsers(list)
+                    //ctx.setUsers(list)
                 }
 
                 override fun onError(e: Throwable) {

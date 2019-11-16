@@ -38,14 +38,6 @@ class LoginPresenter(_ctx: LoginActivity): View.OnClickListener,
         pass = context.findViewById(R.id.password)
         compositeDisposable = CompositeDisposable()
         editor = context.getSharedPreferences("BubbleMeet", MODE_PRIVATE)
-        val em = editor.getString(NotificationCompat.CATEGORY_EMAIL, "")
-        val pas = editor.getString("password", "")
-
-        if(!em.isNullOrEmpty() && !pas.isNullOrEmpty()) {
-            email.text = Editable.Factory.getInstance().newEditable(em)
-            pass.text = Editable.Factory.getInstance().newEditable(pas)
-            login()
-        }
     }
 
     override fun onClick(v: View) {
@@ -77,6 +69,7 @@ class LoginPresenter(_ctx: LoginActivity): View.OnClickListener,
                     context.finish()
                     compositeDisposable.clear()
                 } else {
+                    context.startActivity(Intent(context, LoginActivity::class.java))
                     Toast.makeText(context, context.resources.getString(R.string.user_not_exist), Toast.LENGTH_LONG).show()
                 }
             }

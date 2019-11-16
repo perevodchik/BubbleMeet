@@ -56,7 +56,7 @@ class UserFullFragment(_userData: UserData): Fragment() {
 
         list.add(userData.looking)
         list.add(if(userData.smoking == 1) "Smoking" else "No smoking")
-        list.add(userData.height.toString())
+        list.add(if(userData.height > 0) userData.height.toString() else "")
         list.add(userData.eyeColor)
         list.add(if(userData.marred == 1) "Married" else "Not married")
         list.add(if(userData.smoking == 1) "Have children" else "No children")

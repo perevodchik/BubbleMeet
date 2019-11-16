@@ -21,13 +21,13 @@ class MatchesPresenter(_ctx: MatchesFragment) {
     private val matches = mutableListOf<UserData>()
 
     fun fetchMatches() {
-        var userLike: List<UserData>
         var likeUser: List<UserData>
+        var favorite: List<UserData>
         val list: MutableList<UserData> = mutableListOf()
 
         // страшно =)
         disposable.addAll(
-            api.getFavoriteByMe()
+            api.getFavorite()
                 .subscribeOn(
                     Schedulers.io())
                 .observeOn(
@@ -35,7 +35,7 @@ class MatchesPresenter(_ctx: MatchesFragment) {
                 .subscribeWith(
                     object: DisposableSingleObserver<Response<List<UserData>>>() {
                         override fun onSuccess(r: Response<List<UserData>>) {
-                            likeUser = ListUtil.removeDuplicates(r.body() ?: mutableListOf())
+                            favorite = ListUtil.removeDuplicates(r.body() ?: mutableListOf())
 
                             disposable.addAll(
                                 api.getUserFavorite()
@@ -46,8 +46,8 @@ class MatchesPresenter(_ctx: MatchesFragment) {
                                     .subscribeWith(
                                         object: DisposableSingleObserver<Response<List<UserData>>>() {
                                             override fun onSuccess(r: Response<List<UserData>>) {
-                                                userLike = ListUtil.removeDuplicates(r.body() ?: mutableListOf())
-                                                list.addAll(filterList(userLike, likeUser))
+                                                likeUser = ListUtil.removeDuplicates(r.body() ?: mutableListOf())
+                                                list.addAll(filterList(likeUser, favorite))
 
                                                 context.setMatchers(list)
 
@@ -73,19 +73,17 @@ class MatchesPresenter(_ctx: MatchesFragment) {
                             )
                         }
                         override fun onError(e: Throwable) {
-                            Toast.makeText(context.context, e.localizedMessage, Toast.LENGTH_LONG).show()
                         }
                     }
                 )
         )
-
     }
 
-    private fun filterList(list1: List<UserData>, list2: List<UserData>): List<UserData> {
+    private fun filterList(userLike: List<UserData>, favorite: List<UserData>): List<UserData> {
         val list: MutableList<UserData> = mutableListOf()
 
-        for(u1 in list1) {
-            loop@ for(u2 in list2) {
+        for(u1 in favorite) {
+            loop@ for(u2 in userLike) {
                 if(u1.id == u2.id) {
                     list.add(u1)
                     break@loop

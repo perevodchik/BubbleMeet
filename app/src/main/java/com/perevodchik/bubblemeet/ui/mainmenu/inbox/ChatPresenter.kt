@@ -1,6 +1,5 @@
 package com.perevodchik.bubblemeet.ui.mainmenu.inbox
 
-import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.widget.EditText
 import android.widget.Toast
@@ -11,7 +10,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_chat.view.*
 import okhttp3.ResponseBody
 import retrofit2.Response
 
@@ -25,7 +23,7 @@ class ChatPresenter(_ctx: ChatFragment, _id: Int) {
         fetchMessages()
     }
 
-    private fun fetchMessages() {
+    fun fetchMessages() {
         disposable.addAll(
             api.getMessages(id)
                 .subscribeOn(

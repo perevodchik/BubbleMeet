@@ -28,34 +28,45 @@ class PreloadPresenter(_ctx: Context) {
 
     private fun checkUserData() {
         val s = context.getSharedPreferences("BubbleMeet", Context.MODE_PRIVATE)
-        if(s.contains(NotificationCompat.CATEGORY_EMAIL) && s.contains("password")) {
+        if (s.contains(NotificationCompat.CATEGORY_EMAIL) && s.contains("password")) {
 
-            compositeDisposable.add(api.login(email = s.getString(NotificationCompat.CATEGORY_EMAIL, "")!!, password = s.getString("password", "")!!).subscribeOn(
+            compositeDisposable.add(api.login(
+                email = s.getString(NotificationCompat.CATEGORY_EMAIL, "")!!,
+                password = s.getString("password", "")!!
+            ).subscribeOn(
                 Schedulers.io()
             ).observeOn(
                 AndroidSchedulers.mainThread()
             ).subscribeWith(object : DisposableSingleObserver<Response<ResponseBody>>() {
                 override fun onSuccess(response: Response<ResponseBody>) {
-                    if(response.code() == 200 && response.body() != null) {
+                    if (response.code() == 200 && response.body() != null) {
                         UserInstance.session = response.headers().get("Set-Cookie")
                         val editor = s.edit()
 
-                        editor?.putString("session", UserInstance.session ?: response.headers().get("Set-Cookie"))
+                        editor?.putString(
+                            "session",
+                            UserInstance.session ?: response.headers().get("Set-Cookie")
+                        )
                         editor?.apply()
 
                         context.startActivity(Intent(context, MainActivity::class.java))
                         compositeDisposable.clear()
                     } else {
-                        Toast.makeText(context, context.resources.getString(R.string.user_not_exist), Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            context,
+                            context.resources.getString(R.string.user_not_exist),
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
 
                 override fun onError(e: Throwable) {
-                        Toast.makeText(context, e.localizedMessage ?: "", Toast.LENGTH_LONG).show()
+                    context.startActivity(Intent(context, LoginActivity::class.java))
+                    Toast.makeText(context, e.localizedMessage ?: "", Toast.LENGTH_LONG).show()
                 }
-            }))
-        }
-        else
+            })
+            )
+        } else
             context.startActivity(Intent(context, LoginActivity::class.java))
     }
 

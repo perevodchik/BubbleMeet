@@ -46,19 +46,22 @@ class UserProfileActivity : AppCompatActivity() {
         }
 
         list.add(profile.looking)
-        list.add(if(profile.smoking == 1) "Smoking" else "No smoking")
+        list.add(if(profile.smoking == 1) "Smoking" else if(profile.smoking == 0) "No smoking" else "")
         list.add(profile.height.toString())
         list.add(profile.eyeColor)
-        list.add(if(profile.marred == 1) "Married" else "Not married")
-        list.add(if(profile.smoking == 1) "Have children" else "No children")
-        list.add(if(profile.smoking == 1) "Love to cook" else "No cooking")
+        list.add(if(profile.marred == 1) "Married" else if(profile.smoking == 0) "Not married" else "")
+        list.add(if(profile.smoking == 1) "Have children" else if(profile.smoking == 0) "No children" else "")
+        list.add(if(profile.smoking == 1) "Love to cook" else if(profile.smoking == 0) "No cooking" else "")
 
         findViewById<TextView>(R.id.profile_user_name).text = (profile.name + " " + profile.last_name)
         findViewById<TextView>(R.id.profile_biography).text = profile.hobbes
-        findViewById<TextView>(R.id.profile_year_country).text = (profile.age.toString() + ", " + profile.city)
+        val text = profile.age.toString()
+        if(profile.city.isNotEmpty()) text.plus(", " + profile.city)
+        findViewById<TextView>(R.id.profile_year_country).text = (text)
 
-        R.array.gender
         for(s in list) {
+            if(s.isEmpty() || s == "-1")
+                continue
             val t = TextView(this)
             t.text = s
             t.textSize = 14.0F
@@ -75,10 +78,12 @@ class UserProfileActivity : AppCompatActivity() {
         }
 
         loadImg("${Values.imgUrl}/${profile.avatarFull}", R.id.profile_user_avatar)
-        loadImg("${Values.imgUrl}/${profile.photo[0]}", R.id.user_photo_0)
-        loadImg("${Values.imgUrl}/${profile.photo[1]}", R.id.user_photo_1)
-        loadImg("${Values.imgUrl}/${profile.photo[2]}", R.id.user_photo_2)
 
+        try {
+            loadImg("${Values.imgUrl}/${profile.photo[0]}", R.id.user_photo_0)
+            loadImg("${Values.imgUrl}/${profile.photo[1]}", R.id.user_photo_1)
+            loadImg("${Values.imgUrl}/${profile.photo[2]}", R.id.user_photo_2)
+        } catch (ex: RuntimeException) {}
     }
 
     private fun loadImg(img: String, view: Int) {

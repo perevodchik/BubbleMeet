@@ -24,7 +24,7 @@ data class UserData(
     @SerializedName("Looking") val looking : String,
     @SerializedName("Hobbes") val hobbes : String,
     @SerializedName("timeOnline") val timeOnline : String,
-    @SerializedName("id_favorite") val id_favorite : Int,
+    @SerializedName("id_favorite") var id_favorite : Int,
     @SerializedName("showWindow") val showWindow : Int,
     @SerializedName("isViewed") val isViewed : Int
 )

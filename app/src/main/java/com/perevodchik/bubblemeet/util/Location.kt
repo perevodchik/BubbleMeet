@@ -1,27 +1,26 @@
 package com.perevodchik.bubblemeet.util
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Service
+import android.location.Location
 import android.location.LocationManager
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.maps.model.LatLng
 
 class Location {
 
     companion object {
+        @SuppressLint("StaticFieldLeak")
+        private lateinit  var gpsTracker: GpsTracker
 
-        fun getCoordinates(activity: Activity): Coordinates? {
-            val lm = activity.getSystemService(Service.LOCATION_SERVICE) as LocationManager
-            if (
-                ActivityCompat.checkSelfPermission(activity, "android.permission.ACCESS_FINE_LOCATION") != 0
-                && ActivityCompat.checkSelfPermission(activity, "android.permission.ACCESS_COARSE_LOCATION") != 0) {
-                return null
-            }
-            val location = lm.getLastKnownLocation("network")
-            return if (location != null) {
-                Coordinates(location.latitude, location.longitude)
-            } else null
+        fun initTracker(activity: Activity) {
+            gpsTracker = GpsTracker(activity)
         }
 
+        fun getCoordinates(): Location? {
+            return gpsTracker.getLocation()
+        }
     }
 
     data class Coordinates(var lat: Double, var lng: Double) {

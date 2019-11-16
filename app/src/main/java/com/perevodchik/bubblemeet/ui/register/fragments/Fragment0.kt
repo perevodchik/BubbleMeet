@@ -14,10 +14,13 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.google.android.gms.maps.model.LatLng
 import com.perevodchik.bubblemeet.R
 import com.perevodchik.bubblemeet.ui.mainmenu.MainActivity
 import com.perevodchik.bubblemeet.ui.register.IRegisterFragment
+import com.perevodchik.bubblemeet.util.Location
 import com.perevodchik.bubblemeet.util.UserInstance
+import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import java.io.File
 
@@ -31,6 +34,7 @@ class Fragment0: Fragment(), IRegisterFragment {
     private lateinit var photo2: CircleImageView
     private lateinit var addName: EditText
     private val photos: MutableList<File> = mutableListOf()
+    private lateinit var coords: String
 
     override fun validate(): Boolean {
         return mainPhoto != null && addName.text.isNotEmpty()
@@ -40,8 +44,12 @@ class Fragment0: Fragment(), IRegisterFragment {
     }
 
     override fun setData() {
-        UserInstance.userAvatar = mainPhoto!!
+        UserInstance.userAvatar = mainPhoto
         UserInstance.userPhotos.addAll(photos)
+        UserInstance.profile.name = addName.text.toString()
+        Log.d("UserInstance.profile", coords)
+        UserInstance.profile.location = coords
+        Log.d("UserInstance.profile", UserInstance.profile.location)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,9 +60,12 @@ class Fragment0: Fragment(), IRegisterFragment {
         textOnMainPhoto = view.findViewById(R.id.text_on_avatar)
         addName = view.findViewById(R.id.add_name)
         mainAvatar.setOnClickListener { setPicker(mainAvatar, 0) }
+        textOnMainPhoto.setOnClickListener { setPicker(mainAvatar, 0) }
         photo0.setOnClickListener { setPicker(photo0, 1) }
         photo1.setOnClickListener { setPicker(photo1, 2) }
         photo2.setOnClickListener { setPicker(photo2, 3) }
+        val l = Location.getCoordinates()
+        coords = "${l?.latitude ?: 0}, ${l?.longitude ?: 0}"
     }
 
     fun setPhoto(number: Int, file: File) {
@@ -62,7 +73,7 @@ class Fragment0: Fragment(), IRegisterFragment {
             0 -> {
                 textOnMainPhoto.visibility = View.GONE
                 mainPhoto = file
-                Glide.with(context!!).load(file).into(mainAvatar)
+                Picasso.with(context!!).load(mainPhoto).into(mainAvatar)
             }
             1 -> {
                 photos.add(0, file)
@@ -93,6 +104,7 @@ class Fragment0: Fragment(), IRegisterFragment {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setPicker(circle: CircleImageView, id: Int) {
         circle.setOnClickListener {
             checkPermission()

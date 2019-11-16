@@ -95,7 +95,6 @@ class BubbleFragment0 : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         this.layout = view.findViewById(R.id.bubble_layout)
-        mPresenter.setContext(this)
         mPresenter.getUsers()
         Log.d("ViewCreated", mUsers.size.toString())
     }
@@ -533,7 +532,7 @@ class BubbleFragment0 : Fragment() {
     }
 
     private fun isBubble(event: MotionEvent) {
-        for (i in 0 until layout.childCount) {
+        /*for (i in 0 until layout.childCount) {
             val paramsBubble =
                 layout.getChildAt(i).layoutParams as AbsoluteLayout.LayoutParams
             val x = event.x.toDouble()
@@ -553,7 +552,7 @@ class BubbleFragment0 : Fragment() {
                     return
                 }
             }
-        }
+        }*/
     }
 
     private fun start() {

@@ -27,12 +27,10 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
         registerFragment = FragmentRegister()
         registerFragment.show(supportFragmentManager, "reg")
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.d("setPhoto", "$requestCode -> $resultCode -> ${data.toString()}")
         val file = File(getRealPathFromUri(applicationContext, data?.data))
         (fragments[0] as Fragment0).setPhoto(requestCode, file)
     }
