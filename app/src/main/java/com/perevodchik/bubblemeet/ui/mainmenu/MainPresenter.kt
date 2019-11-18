@@ -43,8 +43,8 @@ class MainPresenter(_ctx: MainActivity): View.OnClickListener,
     private lateinit var fragment: Fragment
 
     init {
-        //fetchAllUsers()
-        //fetchUser()
+        fetchAllUsers()
+        fetchUser()
         fm = context.supportFragmentManager
         matches = context.findViewById(R.id.matches_item)
         likes = context.findViewById(R.id.likes_item)
@@ -86,7 +86,7 @@ class MainPresenter(_ctx: MainActivity): View.OnClickListener,
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : DisposableSingleObserver<Response<List<UserData>>>() {
                     override fun onSuccess(r: Response<List<UserData>>) {
-                        UserInstance.allUsers.addAll(r.body() ?: listOf())
+                        UserInstance.addUsers(r.body() ?: listOf())
                     }
                     override fun onError(e: Throwable) {
                     }
@@ -96,87 +96,82 @@ class MainPresenter(_ctx: MainActivity): View.OnClickListener,
     }
 
     override fun onClick(view: View) {
-//        when (view.id) {
-//            R.id.matches_item -> {
-//                fragment = MatchesFragment.newInstance()
-//                resetBottomMenuIcons()
-//                context.flag = 1
-//                matches.setImageDrawable(
-//                    ContextCompat.getDrawable(
-//                        context,
-//                        R.drawable.ic_matches_active
-//                    )
-//                )
-//                fm.beginTransaction()
-//                    .replace(R.id.container, fragment)
-//                    .addToBackStack(null)
-//                    .commit()
-//            }
-//            R.id.likes_item -> {
-//                fragment = LikesFragment.newInstance()
-//                resetBottomMenuIcons()
-//                context.flag = 1
-//                likes.setImageDrawable(
-//                    ContextCompat.getDrawable(
-//                        context,
-//                        R.drawable.ic_likes_active
-//                    )
-//                )
-//                fm.beginTransaction()
-//                    .replace(R.id.container, fragment)
-//                    .addToBackStack(null)
-//                    .commit()
-//            }
-//            R.id.menu_item -> {
-//                fragment = BubbleFragment.newInstance()
-//                resetBottomMenuIcons()
-//                context.flag = 0
-//                fm.beginTransaction()
-//                    .replace(R.id.container, fragment)
-//                    .addToBackStack(null)
-//                    .commit()
-//
-//                toggle.visibility = View.VISIBLE
-//                toggle.setImageDrawable(context.getDrawable(R.drawable.filter_btn))
-//                toggle.setOnClickListener { context.startActivityForResult(Intent(context, FilterActivity::class.java), 33) }
-//            }
-//            R.id.watchers_item -> {
-//                fragment = WatchersFragment.newInstance()
-//                resetBottomMenuIcons()
-//                context.flag = 1
-//                watchers.setImageDrawable(
-//                    ContextCompat.getDrawable(
-//                        context,
-//                        R.drawable.ic_watchers_active
-//                    )
-//                )
-//                fm.beginTransaction()
-//                    .replace(R.id.container, fragment)
-//                    .addToBackStack(null)
-//                    .commit()
-//            }
-//            R.id.inbox_item -> {
-//                fragment = InboxFragment.newInstance()
-//                resetBottomMenuIcons()
-//                context.flag = 1
-//                inbox.setImageDrawable(
-//                    ContextCompat.getDrawable(
-//                        context,
-//                        R.drawable.ic_inbox_active
-//                    )
-//                )
-//                fm.beginTransaction()
-//                    .replace(R.id.container, fragment)
-//                    .addToBackStack(null)
-//                    .commit()
-//            }
-//            R.id.toggle -> {
-//                context.startActivityForResult(Intent(context, FilterActivity::class.java), 33)
-//            }
-//            R.id.main_menu_user_avatar -> {
-//                context.startActivity(Intent(context, UserProfileActivity::class.java))
-//            }
-//        }
+        when (view.id) {
+            R.id.matches_item -> {
+                fragment = MatchesFragment.newInstance()
+                resetBottomMenuIcons()
+                matches.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_matches_active
+                    )
+                )
+                fm.beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+            R.id.likes_item -> {
+                fragment = LikesFragment.newInstance()
+                resetBottomMenuIcons()
+                likes.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_likes_active
+                    )
+                )
+                fm.beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+            R.id.menu_item -> {
+                fragment = BubbleFragment.newInstance()
+                resetBottomMenuIcons()
+                fm.beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+
+                toggle.visibility = View.VISIBLE
+                toggle.setImageDrawable(context.getDrawable(R.drawable.filter_btn))
+                toggle.setOnClickListener { context.startActivityForResult(Intent(context, FilterActivity::class.java), 33) }
+            }
+            R.id.watchers_item -> {
+                fragment = WatchersFragment.newInstance()
+                resetBottomMenuIcons()
+                watchers.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_watchers_active
+                    )
+                )
+                fm.beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+            R.id.inbox_item -> {
+                fragment = InboxFragment.newInstance()
+                resetBottomMenuIcons()
+                inbox.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_inbox_active
+                    )
+                )
+                fm.beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+            R.id.toggle -> {
+                context.startActivityForResult(Intent(context, FilterActivity::class.java), 33)
+            }
+            R.id.main_menu_user_avatar -> {
+                context.startActivity(Intent(context, UserProfileActivity::class.java))
+            }
+        }
     }
 
     private fun resetBottomMenuIcons() {

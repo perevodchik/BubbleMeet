@@ -17,11 +17,17 @@ import androidx.fragment.app.Fragment
 import com.perevodchik.bubblemeet.R
 import com.perevodchik.bubblemeet.custom.Bubble
 import com.perevodchik.bubblemeet.data.AnimateWrapper
+import com.perevodchik.bubblemeet.data.model.UserData
 import com.perevodchik.bubblemeet.ui.filter.FilterActivity
 import com.perevodchik.bubblemeet.util.Api
 import com.perevodchik.bubblemeet.util.Math
+import com.perevodchik.bubblemeet.util.UserInstance
 import com.perevodchik.bubblemeet.util.distance
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
+import retrofit2.Response
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.pow
@@ -33,6 +39,7 @@ class BubbleFragment : Fragment() {
     private lateinit var grid: AbsoluteLayout
     private val api: Api = Api()
     private val disposable = CompositeDisposable()
+    private val presenter = BubblePresenter(this)
     /** count rows at the grid */
     private var rows: Int = 0
     /** container for hold size screen */
@@ -44,7 +51,12 @@ class BubbleFragment : Fragment() {
     private val display by lazy { activity!!.windowManager.defaultDisplay }
     /** default (start and max) bubble size */
     //private val defaultBubbleSize by lazy { Math.dpToPixel(200.0f, context!!).roundToInt() }
-    private val defaultBubbleSize by lazy { Math.dpToPixel(size.x / 6.0f, context!!).roundToInt() }
+    private val defaultBubbleSize by lazy {
+        (Math.dpToPixel(
+            size.x / 6.0f,
+            context!!
+        ) * 0.95f).roundToInt()
+    }
     /** center of the screen */
     private val center by lazy { Point(size.x / 2, size.y / 2) }
     /** point with coordinates where user up finger */
@@ -77,8 +89,6 @@ class BubbleFragment : Fragment() {
     private var inertialX: Int = 0
     private var inertialY: Int = 0
 
-    private var isFirstScale: Boolean = true
-
     private var t = 0
 
     companion object {
@@ -86,9 +96,10 @@ class BubbleFragment : Fragment() {
         private const val maxScaleMultiplier: Float = 1.1f
         private const val borderMultiplier = 5
         private const val inertiaScale = 1
-//        private val users: MutableList<UserData> = mutableListOf()
-        private val users: MutableList<String> = mutableListOf()
+        private val users: MutableList<UserData> = mutableListOf()
+        //        private val users: MutableList<String> = mutableListOf()
         private var bubbles: MutableList<Bubble> = mutableListOf()
+
         fun newInstance() = BubbleFragment()
     }
 
@@ -102,7 +113,6 @@ class BubbleFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d("steep", "onCreateView")
         return inflater.inflate(R.layout.fragment_bubble_grid0, null)
     }
 
@@ -113,18 +123,47 @@ class BubbleFragment : Fragment() {
         grid = activity!!.findViewById(R.id.grid_bubbles)
         grid.setOnTouchListener(getTouchListener())
         display.getSize(size)
+
         fetch()
         toggle()
     }
 
     override fun onStart() {
         super.onStart()
-        Log.d("onStart anim start ->", "$animateId")
-        //scale(++animateId)
-        Log.d("onStart anim end ->", "$animateId")
         Log.d("steep", "onStart")
-        isOpenedUser = false
-        //animateId++
+        val list = mutableListOf<UserData>()
+        list.addAll(UserInstance.allUsers)
+        Log.d("users pre filter", "${users.size}")
+
+        if(UserInstance.filters.size == 0 && list.size == 0)
+            return
+
+        presenter.filterByGender(list, UserInstance.filters["gender"] ?: "null")
+
+        presenter.filterByAge(list, UserInstance.filters["age"] ?: "null")
+
+        presenter.filterByLocation(list, UserInstance.filters["location"] ?: "null")
+
+        presenter.filterByEyeColor(list, UserInstance.filters["eye"] ?: "null")
+
+        presenter.filterByHeight(list, UserInstance.filters["height"] ?: "null")
+
+        presenter.filterBySmoking(list, UserInstance.filters["smoking"] ?: "null")
+
+        presenter.filterByMarried(list, UserInstance.filters["married"] ?: "null")
+
+        presenter.filterByChildren(list, UserInstance.filters["children"] ?: "null")
+
+        presenter.filterByLookingFor(list, UserInstance.filters["looking"] ?: "null")
+
+        presenter.filterByLoveToCook(list, UserInstance.filters["cook"] ?: "null")
+
+        Log.d("filters ->", "->!!! ${UserInstance.filters} !!!<-")
+        users.clear()
+        users.addAll(list)
+        Log.d("users post filter", "${users.size}")
+        grid.removeAllViewsInLayout()
+        init()
     }
 
     private fun toggle() {
@@ -135,12 +174,21 @@ class BubbleFragment : Fragment() {
         }
     }
 
+    private fun setFilters() {
+        Log.d("setFilters", "start")
+        for (e in UserInstance.filters.entries) {
+            Log.d("filter ->", "$e")
+        }
+        Log.d("setFilters", "end")
+    }
+
     /**
      * check is bubble`s out of the left border
      */
     private fun checkLeftBorder(): Boolean {
         if (objLeftTop.x + objLeftTop.width > defaultBubbleSize / borderMultiplier && !isInertialMoveFromLeft) {
             isBreakMoving = true
+            isInertialMove = false
             isInertialMoveFromLeft = true
 
             if (objLeftTop.y > 0)
@@ -162,8 +210,8 @@ class BubbleFragment : Fragment() {
             }
 
             for (aw in animList) {
-                aw.params(600.0f)
-                aw.setX(aw.view.x - (defaultBubbleSize / borderMultiplier))
+                aw.params(100.0f)
+                aw.setX(aw.view.x - objLeftTop.x - objLeftTop.width)
             }
         }
         return isInertialMoveFromLeft
@@ -173,8 +221,9 @@ class BubbleFragment : Fragment() {
      * check is bubble`s out of the top border
      */
     private fun checkTopBorder(): Boolean {
-        if (objLeftTop.y + objLeftTop.height > defaultBubbleSize / borderMultiplier && !isInertialMoveFromTop) {
+        if (objLeftTop.y > defaultBubbleSize / borderMultiplier && !isInertialMoveFromTop) {
             isBreakMoving = true
+            isInertialMove = false
             isInertialMoveFromTop = true
 
             if (objLeftTop.x > 0)
@@ -197,8 +246,8 @@ class BubbleFragment : Fragment() {
             }
 
             for (aw in animList) {
-                aw.params(600.0f)
-                aw.setY(aw.view.y - (defaultBubbleSize / borderMultiplier))
+                aw.params(100.0f)
+                aw.setY(aw.view.y - objLeftTop.y - objLeftTop.height)
             }
         }
         return isInertialMoveFromTop
@@ -211,6 +260,7 @@ class BubbleFragment : Fragment() {
     private fun checkRightBorder(): Boolean {
         if (objRight.x < size.x - defaultBubbleSize / borderMultiplier && !isInertialMoveFromRight) {
             isBreakMoving = true
+            isInertialMove = false
             isInertialMoveFromRight = true
 
             if (objLeftTop.y > 0)
@@ -232,8 +282,8 @@ class BubbleFragment : Fragment() {
             }
 
             for (aw in animList) {
-                aw.params(600.0f)
-                aw.setX(aw.view.x + (defaultBubbleSize / borderMultiplier))
+                aw.params(100.0f)
+                aw.setX(aw.view.x + size.x - objRight.x)
             }
         }
         return isInertialMoveFromRight
@@ -246,6 +296,7 @@ class BubbleFragment : Fragment() {
     private fun checkBottomBorder(): Boolean {
         if (objBottom.y < size.y - (size.y / borderMultiplier) && !isInertialMoveFromBottom) {
             isBreakMoving = true
+            isInertialMove = false
             isInertialMoveFromBottom = true
 
             if (objLeftTop.x > 0)
@@ -268,8 +319,8 @@ class BubbleFragment : Fragment() {
             }
 
             for (aw in animList) {
-                aw.params(600.0f)
-                aw.setY(aw.view.y + (defaultBubbleSize / borderMultiplier))
+                aw.params(100.0f)
+                aw.setY(aw.view.y + size.y - objBottom.y - objBottom.height)
             }
         }
         return isInertialMoveFromBottom
@@ -287,18 +338,19 @@ class BubbleFragment : Fragment() {
         isInertialMoveFromTop = false
         isInertialMoveFromRight = false
         isInertialMoveFromBottom = false
+        var counter = 10
+        val handler = Handler()
 
-        if (isBreakMoving) {
-            isInertialMove = false
-            isSlowed = false
-            val handler = Handler()
-            handler.postDelayed({
+        handler.postDelayed(object : Runnable {
+            override fun run() {
                 scale(++animateId)
-            }, 250)
-            handler.postDelayed({
-                isBreakMoving = false
-            }, 750)
-        }
+                if (--counter > 0)
+                    handler.postDelayed(this, 50)
+            }
+        }, 50)
+        handler.postDelayed({
+            isBreakMoving = false
+        }, 250)
     }
 
     /**
@@ -307,9 +359,9 @@ class BubbleFragment : Fragment() {
      * and blocking user permission to move grid with finger for 500 millis
      */
     private fun validatePositionAtBorder() {
-        /*if (checkLeftBorder() || checkTopBorder() ||
+        if (checkLeftBorder() || checkTopBorder() ||
             checkRightBorder() || checkBottomBorder()
-        ) moveFromBorder()*/
+        ) moveFromBorder()
 
     }
 
@@ -326,8 +378,6 @@ class BubbleFragment : Fragment() {
                 val fm = fragmentManager
                 isOpenedUser = true
 
-                Log.d("fm ->", "${fm == null}")
-
 //                fm?.beginTransaction()
 //                    ?.replace(R.id.container, UserPreviewFragment(users[i], fm))
 //                    ?.addToBackStack(null)
@@ -335,6 +385,37 @@ class BubbleFragment : Fragment() {
                 return
             }
         }
+    }
+
+    private fun startInertial() {
+        inertialX /= 2
+        inertialY /= 2
+        if (abs(inertialX) > 2 && abs(inertialY) > 2) {
+            if (inertialX > 60)
+                inertialX = 60
+            else if (inertialX in 0..20)
+                inertialX = 20
+
+            if (inertialY > 60)
+                inertialY = 60
+            else if (inertialY in 0..20)
+                inertialY = 20
+
+            if (inertialX < -60)
+                inertialX = -60
+            else if (inertialX in -0 downTo -20)
+                inertialX = -20
+
+            if (inertialY < -60)
+                inertialY = -60
+            else if (inertialY in -0 downTo -20)
+                inertialY = -20
+        }
+
+        isInertialMove = true
+        validatePositionAtBorder()
+        if (isInertialMove)
+            inertial()
     }
 
     /**
@@ -351,7 +432,6 @@ class BubbleFragment : Fragment() {
                     0 -> {
                         isInertialMove = false
                         prevPoint.set(e.x.roundToInt(), e.y.roundToInt())
-                        Log.d("event 0 ->", "x -> ${e.rawX}$ !!! y -> ${e.rawX}")
                         if (isBreakMoving)
                             return@OnTouchListener false
                         animList[i].params()
@@ -362,61 +442,25 @@ class BubbleFragment : Fragment() {
 
                         }
                         startClickMillis = Calendar.getInstance().timeInMillis
-                        Log.d("isInertialMoveFromLeft", "$isInertialMoveFromLeft")
-                        Log.d("isInertialMoveFromTop", "$isInertialMoveFromTop")
-                        Log.d("isInertialMoveFromRight", "$isInertialMoveFromRight")
-                        Log.d("isInertialMoveFromBotom", "$isInertialMoveFromBottom")
-                        Log.d("isBreakMove", "$isBreakMoving")
                     }
                     1 -> {
-                        Log.d("event 1 ->", "x -> ${e.rawX}$ !!! y -> ${e.rawX}")
+                        endClickMillis = Calendar.getInstance().timeInMillis
 //                        if(Calendar.getInstance().timeInMillis - startClickMillis < 100) {
 //                            if(!isOpenedUser)
 //                                checkIsUser(e)
 //                        }
                         if (Calendar.getInstance().timeInMillis - lastMoveMillis < 20) {
-                            endClickMillis = Calendar.getInstance().timeInMillis
+                            startInertial()
 
-                            inertialX /= 2
-                            inertialY /= 2
-                            if (abs(inertialX) > 2 && abs(inertialY) > 2) {
-                                if (inertialX > 80)
-                                    inertialX = 80
-                                else if (inertialX in 0..30)
-                                    inertialX = 15
-
-                                if (inertialY > 80)
-                                    inertialY = 80
-                                else if (inertialY in 0..30)
-                                    inertialY = 30
-
-                                if (inertialX < -80)
-                                    inertialX = -80
-                                else if (inertialX in -0 downTo -30)
-                                    inertialX = -30
-
-                                if (inertialY < -80)
-                                    inertialY = -80
-                                else if (inertialY in -0 downTo -30)
-                                    inertialY = -30
-                            }
-
-                            Log.d("event 1 intertial ->", "x -> $inertialX$ !!! y -> $inertialY")
-
-                            validatePositionAtBorder()
-
-                            isInertialMove = true
-                            //afterClickScale()
-                            inertial()
                             return@OnTouchListener true
                         }
+                        validatePositionAtBorder()
                     }
                     2 -> {
                         if (isBreakMoving)
                             return@OnTouchListener false
                         inertialX = (e.x - prevPoint.x.toFloat()).roundToInt()
                         inertialY = (e.y - prevPoint.y.toFloat()).roundToInt()
-                        validatePositionAtBorder()
 
                         lastMoveMillis = Calendar.getInstance().timeInMillis
 
@@ -507,10 +551,8 @@ class BubbleFragment : Fragment() {
                             isSlowed = true
                         }
                     }
-                    Log.d("inertial", "x -> $inertialX !!! y -> $inertialY")
                     move()
                     scale(++animateId)
-                    validatePositionAtBorder()
                     myHandler.postDelayed(this, 50)
                 }
             }
@@ -518,26 +560,9 @@ class BubbleFragment : Fragment() {
     }
 
     private fun move() {
-//        val dX = //sqrt(inertialX + 0.1f)
-//            if(inertialX > 0)
-//            //sqrt(inertialX + 0.1f) / 2
-//                inertialX + 0.0f
-//            else
-//                0.0f
-//        val dY = //sqrt(inertialX + 0.1f)
-//            if(inertialY > 0)
-//            //sqrt(inertialY + 0.1f) / 2
-//                inertialY + 0.0f
-//            else
-//                0.0f
-//        val mX = dX > 0.0f
-//        val mY = dY > 0.0f
-        for(a in animList) {
-            if(isInertialMove)
-            a.inertial(inertialX + 0.0f, inertialY + 0.0f)
-//            a.inertial(dX, dY)
-//              a.inertialMove(isX = true, isY = true)
-//            scale(++animateId)
+        for (a in animList) {
+            if (isInertialMove)
+                a.inertial(inertialX + 0.0f, inertialY + 0.0f)
         }
         validatePositionAtBorder()
     }
@@ -596,6 +621,7 @@ class BubbleFragment : Fragment() {
             for (i in 0 until grid.childCount) {
                 if (animateId != _id)
                     return
+                Log.d("scale", "anim id -> $_id")
                 val c = grid.getChildAt(i)
                 if (isViewShowOnScreen(c)) {
                     val anim = animList[i]
@@ -604,7 +630,7 @@ class BubbleFragment : Fragment() {
                     anim.startScaleAnimation()
                 }
             }
-        }
+        } else Log.d("scale", "anim id -> $_id return cause new anim id -> $animateId")
     }
 
     /**
@@ -630,12 +656,10 @@ class BubbleFragment : Fragment() {
         var anim: AnimateWrapper? = null
         for (a in animList) {
             if (a.view == v) {
-                Log.d("find", "find")
                 anim = a
             }
         }
         val startScale = getScaleSize(v, p)
-        Log.d("startScale", "$startScale")
         anim?.scale(startScale)
         anim?.startScaleAnimation()
     }
@@ -675,19 +699,20 @@ class BubbleFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility", "InflateParams")
     private fun init() {
+        setFilters()
+        animList.clear()
         var counter = 0
         rows = sqrt(users.size.toDouble()).toInt()
 
         for (i in 0 until users.size)
             points.add(Point())
 
-        defSizeX = ((size.x / 2.45)).toInt()
-        defSizeY = (size.y / 4.9).toInt()
+        defSizeX = ((size.x / 2.45)).toInt() - 50
+        defSizeY = (size.y / 4.9).toInt() - 50
         sizeX = defSizeX * (rows - 1)
         sizeY = defSizeY * (rows - 1)
         startX = 0 - (sizeX / 2)
         startY = 0 - (sizeY / 2)
-        var c = 0
 
         for (i2 in 0 until rows) {
             for (j in 0 until rows) {
@@ -731,11 +756,9 @@ class BubbleFragment : Fragment() {
         // -> find the left, top, right and bottom elements
         objLeftTop = grid.getChildAt(0)
 
-        objRight = if(rows > 2) {
-            Log.d("text ->", (rows * 2 - 1).toString())
+        objRight = if (rows > 2) {
             grid.getChildAt(rows * 2 - 1)
         } else {
-            Log.d("text ->", (rows - 1).toString())
             grid.getChildAt(rows - 1)
         }
         objBottom = grid.getChildAt(grid.childCount - 1)
@@ -745,7 +768,8 @@ class BubbleFragment : Fragment() {
 //            Picasso.with(context!!).load("${Values.imgUrl}/${users[cc].avatarSmall}")
 //                .into(bubble as CircleImageView)
         }
-        (objRight as TextView).background = (resources.getDrawable(R.drawable.main_menu_avatar_background, null))
+        (objRight as TextView).background =
+            (resources.getDrawable(R.drawable.main_menu_avatar_background, null))
     }
 
     /**
@@ -753,30 +777,41 @@ class BubbleFragment : Fragment() {
      * create all child`s view and set start params
      */
     private fun fetch() {
-        if(users.isEmpty()) {
-            for(c in 0..255)
-                users.add("User $c")
+//        if(users.isEmpty()) {
+//            for(c in 0..255)
+//                users.add("User $c")
+//            init()
+//        }
+        if (users.isEmpty())
+            if (UserInstance.allUsers.isEmpty()) {
+                Log.d("fetch", "UserInstance.allUsers.isEmpty()")
+                disposable.addAll(
+                    api.getUsers()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(object :
+                            DisposableSingleObserver<Response<List<UserData>>>() {
+                            override fun onSuccess(r: Response<List<UserData>>) {
+                                UserInstance.addUsers(r.body() ?: listOf())
+                                users.addAll(UserInstance.allUsers)
+                                users.shuffle()
+                                init()
+                            }
+
+                            override fun onError(e: Throwable) {
+                            }
+
+                        })
+                )
+            } else {
+                Log.d("fetch", "!UserInstance.allUsers.isEmpty()")
+                users.addAll(UserInstance.allUsers)
+                users.shuffle()
+                init()
+            }
+        else {
+            Log.d("fetch", "!users.isEmpty()")
             init()
         }
-//        if (users.isEmpty())
-//            disposable.addAll(
-//                api.getUsers()
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribeWith(object : DisposableSingleObserver<Response<List<UserData>>>() {
-//                        override fun onSuccess(r: Response<List<UserData>>) {
-//                            UserInstance.allUsers.addAll(r.body() ?: listOf())
-//                            users.addAll(UserInstance.allUsers)
-//                            users.shuffle()
-//                            init()
-//                            //scale(++animateId)
-//                        }
-//
-//                        override fun onError(e: Throwable) {
-//                        }
-//
-//                    })
-//            )
-//        else init()
     }
 }

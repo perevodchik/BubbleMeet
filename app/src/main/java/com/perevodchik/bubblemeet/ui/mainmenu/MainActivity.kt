@@ -1,6 +1,7 @@
 package com.perevodchik.bubblemeet.ui.mainmenu
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -13,7 +14,6 @@ import com.perevodchik.bubblemeet.util.UserInstance
 
 class MainActivity : AppCompatActivity() {
     private lateinit var presenter: MainPresenter
-    var flag = 0
 
     companion object {
         val PERMISSIONS_STORAGE = arrayOf(
@@ -22,16 +22,21 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Log.d("code", "request -> $requestCode !!! result -> $resultCode")
 
-        val str = data?.getStringExtra("filter") ?: "-str"
-        Log.d("filter string ->", str)
-        UserInstance.addFilters(str)
+        if(resultCode == Activity.RESULT_OK) {
+//            Log.d("has filter -> ", "-> ${data?.hasExtra("filter")}")
+//            Log.d("filter -> ", "-> ${data?.getStringExtra("filter")} <-")
+//            val str = data?.getStringExtra("filter") ?: "-str"
+//            Log.d("filter string ->", str)
+//            UserInstance.addFilters(str)
+//            Log.d("resultCode", RESULT_OK.toString())
+            Log.d("filters ->", "->!!! ${UserInstance.filters} !!! <-")
+        }
+        Log.d("resultCode", resultCode.toString())
+
+
 
         super.onActivityResult(requestCode, resultCode, data)
     }

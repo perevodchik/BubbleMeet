@@ -49,8 +49,8 @@ class AnimateWrapper(v: View) {
         val springY = animateSpringY.spring
         springX.stiffness = stiffness
         springY.stiffness = stiffness
-        springY.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
-        springX.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
+        springY.dampingRatio = SpringForce.DAMPING_RATIO_NO_BOUNCY
+        springX.dampingRatio = SpringForce.DAMPING_RATIO_NO_BOUNCY
     }
 
     fun inertial(valX: Float, valY: Float) {
@@ -83,10 +83,12 @@ class AnimateWrapper(v: View) {
     }
 
     fun inertialMove(isX: Boolean, isY: Boolean) {
-        if(isX)
+        if (isX) {
             animateSpringX.start()
-        if(isY)
+        }
+        if (isY) {
             animateSpringY.start()
+        }
     }
 
     fun scale(value: Float) {

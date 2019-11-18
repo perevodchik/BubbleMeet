@@ -11,8 +11,9 @@ import android.widget.RadioGroup
 import androidx.core.content.ContextCompat
 import com.perevodchik.bubblemeet.R
 import com.perevodchik.bubblemeet.custom.Radio
+import com.perevodchik.bubblemeet.data.model.Filter
+import com.perevodchik.bubblemeet.util.UserInstance
 import com.perevodchik.bubblemeet.util.dpToPx
-import com.perevodchik.bubblemeet.util.margin
 
 class FilterActivity : AppCompatActivity() {
     private val filters: HashMap<String, String> = HashMap()
@@ -29,9 +30,8 @@ class FilterActivity : AppCompatActivity() {
         setItems(findViewById(R.id.smoking_group), resources.getStringArray(R.array.smoking), "smoking")
         setItems(findViewById(R.id.married_group), resources.getStringArray(R.array.married), "married")
         setItems(findViewById(R.id.children_group), resources.getStringArray(R.array.children), "children")
-        setItems(findViewById(R.id.looking_group), resources.getStringArray(R.array.location), "looking")
+        setItems(findViewById(R.id.looking_group), resources.getStringArray(R.array.lookingForChoice), "looking")
         setItems(findViewById(R.id.cook_group), resources.getStringArray(R.array.loveToCook), "cook")
-
     }
 
     private fun setItems(rg: RadioGroup, list: Array<String>, key: String) {
@@ -46,7 +46,6 @@ class FilterActivity : AppCompatActivity() {
 
             r.setOnClickListener {
                 filters[r.key] = r.value
-                Log.d("Filters -> ", filters.toString())
             }
 
             rg.addView(r)
@@ -54,16 +53,24 @@ class FilterActivity : AppCompatActivity() {
     }
 
     fun useNavigate(view: View) {
-        val i = Intent()
+//        val i = Intent()
         when(view.id) {
             R.id.btn_set_filter -> {
-                val str = ""
+                /*var str = ""
                 for(e in filters.entries) {
-                    str.plus("${e.key}=${e.value},")
+                    str = str.plus("${e.key}=${e.value},")
                 }
-                i.putExtra("filter", str)
+                Log.d("filters ", "->!!! $str !!!<-")
+                i.putExtra("filter", str)*/
 
-                setResult(Activity.RESULT_OK, i)
+                setResult(Activity.RESULT_OK)
+                Log.d("filters", "$filters")
+                Log.d("UserInstance.filters", "${UserInstance.filters}")
+                if(filters.isEmpty())
+                    UserInstance.filters.clear()
+                else
+                    UserInstance.filters.putAll(filters)
+                Log.d("UserInstance.filters", "${UserInstance.filters}")
                 finish()
             }
             R.id.btn_close_filter -> { finish() }

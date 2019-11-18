@@ -21,7 +21,7 @@ import com.squareup.picasso.Picasso
 import java.lang.Exception
 
 class UserProfileActivity : AppCompatActivity() {
-    lateinit var flex: FlexboxLayout
+    private lateinit var flex: FlexboxLayout
     private val list = arrayListOf<String>()
     private val profile = UserInstance.profile
     private lateinit var logout: ImageView

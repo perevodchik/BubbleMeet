@@ -54,7 +54,7 @@ class BubbleFragment0 : Fragment() {
     /* access modifiers changed from: private */
     private lateinit var layout: AbsoluteLayout
     private var mMultiplies: DoubleArray? = null
-    private val mPresenter = BubblePresenter()
+//    private val mPresenter = BubblePresenter()
     /* access modifiers changed from: private */
     private var mPreviousMoveTime: Long = 0
     private var mRows: Int = 0
@@ -95,7 +95,7 @@ class BubbleFragment0 : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         this.layout = view.findViewById(R.id.bubble_layout)
-        mPresenter.getUsers()
+        //mPresenter.getUsers()
         Log.d("ViewCreated", mUsers.size.toString())
     }
 

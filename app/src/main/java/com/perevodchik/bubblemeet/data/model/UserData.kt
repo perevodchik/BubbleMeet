@@ -22,6 +22,7 @@ data class UserData(
     @SerializedName("Marred") val marred : Int,
     @SerializedName("Children") val children : Int,
     @SerializedName("Looking") val looking : String,
+    @SerializedName("Love_cook") val cook: Int,
     @SerializedName("Hobbes") val hobbes : String,
     @SerializedName("timeOnline") val timeOnline : String,
     @SerializedName("id_favorite") var id_favorite : Int,
