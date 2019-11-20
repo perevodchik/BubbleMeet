@@ -10,6 +10,7 @@ class AnimateWrapper(v: View) {
     private val animateSpringY = SpringAnimation(v, DynamicAnimation.Y, v.y)
     private val animateSpringScaleX = SpringAnimation(v, DynamicAnimation.SCALE_X, 1.0f)
     private val animateSpringScaleY = SpringAnimation(v, DynamicAnimation.SCALE_Y, 1.0f)
+    private val animateAlpha = SpringAnimation(v, DynamicAnimation.ALPHA, 0.0f)
     val view = v
 
     companion object {
@@ -98,6 +99,14 @@ class AnimateWrapper(v: View) {
         scaleY.finalPosition = value
     }
 
+    fun stopAnimation() {
+        animateSpringX.cancel()
+        animateSpringY.cancel()
+        animateSpringScaleX.cancel()
+        animateSpringScaleY.cancel()
+        animateAlpha.cancel()
+    }
+
     fun startMoveAnimation() {
         animateSpringX.start()
         animateSpringY.start()
@@ -111,5 +120,9 @@ class AnimateWrapper(v: View) {
     fun startAnimation() {
         startMoveAnimation()
         startScaleAnimation()
+    }
+
+    fun startAlphaAnimation() {
+        animateAlpha.animateToFinalPosition(1.0f)
     }
 }

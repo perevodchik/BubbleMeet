@@ -6,6 +6,13 @@
     android:orientation="horizontal"
     android:background="@color/colorBackground">
 
+    <ImageView
+        android:id="@+id/inbox_indicator"
+        android:layout_width="25dp"
+        android:layout_height="80dp"
+        android:src="@drawable/inbox_element_middle"
+        tools:ignore="ContentDescription" />
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/chat_item_avatar"
         android:layout_width="75dp"

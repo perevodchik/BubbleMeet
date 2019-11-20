@@ -532,7 +532,7 @@ class BubbleFragment0 : Fragment() {
     }
 
     private fun isBubble(event: MotionEvent) {
-        /*for (i in 0 until layout.childCount) {
+        for (i in 0 until layout.childCount) {
             val paramsBubble =
                 layout.getChildAt(i).layoutParams as AbsoluteLayout.LayoutParams
             val x = event.x.toDouble()
@@ -552,7 +552,7 @@ class BubbleFragment0 : Fragment() {
                     return
                 }
             }
-        }*/
+        }
     }
 
     private fun start() {

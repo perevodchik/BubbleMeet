@@ -1,5 +1,6 @@
 package com.perevodchik.bubblemeet.ui.mainmenu.inbox
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,11 +23,17 @@ class ChatAdapter(_list: List<ChatItem>, _activity: MainActivity?): BaseAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val chat = convertView ?: inflater!!.inflate(R.layout.item_chat, parent, false)
 
+        val indicator: ImageView = chat.findViewById(R.id.inbox_indicator)
         val name: TextView = chat.findViewById(R.id.chat_item_name)
         val city: TextView = chat.findViewById(R.id.chat_item_country)
         val open: ImageView = chat.findViewById(R.id.chat_item_open)
         val avatar: CircleImageView = chat.findViewById(R.id.chat_item_avatar)
 
+//        when (position) {
+//            0 -> indicator.setImageDrawable(convertView?.resources?.getDrawable(R.drawable.inbox_element_top, null))
+//            count -> indicator.setImageDrawable(convertView?.resources?.getDrawable(R.drawable.inbox_element_bottom, null))
+//            else -> indicator.setImageDrawable(convertView?.resources?.getDrawable(R.drawable.inbox_element_middle, null))
+//        }
 
         open.setOnClickListener {
             val t = activity?.supportFragmentManager?.beginTransaction()

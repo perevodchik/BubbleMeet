@@ -34,47 +34,60 @@
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteY="244dp" />
 
-    <EditText
-        android:id="@+id/first_message_text"
+
+    <!--    <ImageView-->
+    <!--        android:id="@+id/imageView3"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="100dp"-->
+    <!--        android:layout_marginTop="60dp"-->
+    <!--        android:src="@color/colorAccent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/input_element"-->
+    <!--        tools:ignore="ContentDescription"-->
+    <!--        tools:layout_editor_absoluteX="16dp" />-->
+
+    <LinearLayout
+        android:id="@+id/input_element"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="68dp"
-        android:hint="@string/first_message"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@+id/match_image0"
-        tools:ignore="Autofill,TextFields"
-        tools:layout_editor_absoluteX="16dp" />
+        tools:layout_editor_absoluteX="30dp">
 
-    <Button
-        android:id="@+id/send_first_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
-        android:text="@string/first_message"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/first_message_text" />
+        <EditText
+            android:id="@+id/first_message_text"
+            android:layout_width="290dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:hint="@string/first_message"
+            app:layout_constraintTop_toBottomOf="@+id/match_image0"
+            tools:ignore="Autofill,TextFields"
+            tools:layout_editor_absoluteX="16dp" />
 
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="60dp"
-        android:src="@color/colorAccent"
-        app:layout_constraintTop_toBottomOf="@+id/first_message_text"
-        tools:ignore="ContentDescription"
-        tools:layout_editor_absoluteX="16dp" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/send_first_message"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/white_circle_background"
+            android:src="@drawable/top_arrow"
+            android:text="@string/first_message"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/first_message_text" />
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Картинку не дали"
+        android:text="@string/match"
         android:textColor="@color/colorGrey"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/imageView3"
-        app:layout_constraintEnd_toStartOf="@+id/imageView3"
+        android:textSize="60sp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView3"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/input_element" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

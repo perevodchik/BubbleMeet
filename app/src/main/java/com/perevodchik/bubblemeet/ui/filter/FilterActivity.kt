@@ -53,24 +53,14 @@ class FilterActivity : AppCompatActivity() {
     }
 
     fun useNavigate(view: View) {
-//        val i = Intent()
         when(view.id) {
             R.id.btn_set_filter -> {
-                /*var str = ""
-                for(e in filters.entries) {
-                    str = str.plus("${e.key}=${e.value},")
-                }
-                Log.d("filters ", "->!!! $str !!!<-")
-                i.putExtra("filter", str)*/
 
                 setResult(Activity.RESULT_OK)
-                Log.d("filters", "$filters")
-                Log.d("UserInstance.filters", "${UserInstance.filters}")
                 if(filters.isEmpty())
                     UserInstance.filters.clear()
                 else
                     UserInstance.filters.putAll(filters)
-                Log.d("UserInstance.filters", "${UserInstance.filters}")
                 finish()
             }
             R.id.btn_close_filter -> { finish() }

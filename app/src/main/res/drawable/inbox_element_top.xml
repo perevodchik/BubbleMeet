@@ -1,0 +1,25 @@
+<layer-list xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:height="15dp" android:width="15dp"
+        android:drawable="@drawable/inbox_element_circle"
+        tools:targetApi="m"
+        tools:ignore="UnusedAttribute">
+        <scale android:scaleHeight="25dp" android:scaleWidth="25dp"/>
+    </item>
+    <!--The middle layer is a red oval.-->
+    <item android:height="100dp" android:width="2dp" android:gravity="center"
+        android:drawable="@drawable/inbox_element_middle"
+        tools:targetApi="m"
+        tools:ignore="UnusedAttribute">
+    </item>
+</layer-list>
+
+<!--    <?xml version="1.0" encoding="utf-8"?>-->
+<!--<selector xmlns:android="http://schemas.android.com/apk/res/android">-->
+<!--<item>-->
+<!--    <shape android:shape="oval">-->
+<!--        <solid android:color="@color/colorRed"/>-->
+<!--        <size android:width="10dp" android:height="10dp"/>-->
+<!--    </shape>-->
+<!--</item>-->
+<!--</selector>-->

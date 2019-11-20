@@ -78,4 +78,5 @@
     <string name="text">Message text</string>
     <string name="send_message">Enter your message</string>
     <string name="select_photo">Select photo</string>
+    <string name="match">Match!</string>
 </resources>

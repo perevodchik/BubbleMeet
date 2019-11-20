@@ -1,0 +1,16 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <item android:top="100dp" android:height="15dp" android:width="15dp"
+    android:drawable="@drawable/inbox_element_circle"
+    tools:targetApi="m"
+    tools:ignore="UnusedAttribute">
+    <scale android:scaleHeight="25dp" android:scaleWidth="25dp"/>
+    </item>
+    <item
+        android:width="2dp"
+        android:height="100dp"
+        android:drawable="@drawable/inbox_element_middle"
+        android:gravity="center"
+        tools:ignore="UnusedAttribute"
+        tools:targetApi="m" />
+</layer-list>

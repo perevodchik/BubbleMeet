@@ -39,22 +39,6 @@ class RegisterPresenter(_ctx: Activity) {
                 AndroidSchedulers.mainThread()
             ).subscribeWith(object : DisposableSingleObserver<Response<ResponseBody>>() {
                 override fun onSuccess(response: Response<ResponseBody>) {
-                    for(p in UserInstance.userPhotos) {
-                        composite.add(
-                            api.addPhoto(p).subscribeOn(
-                                Schedulers.io()
-                            ).observeOn(AndroidSchedulers.mainThread()
-                            ).subscribeWith(object: DisposableSingleObserver<ResponseBody>() {
-                                override fun onSuccess(t: ResponseBody) {
-                                    Log.d("addPhoto", t.string())
-                                }
-                                override fun onError(e: Throwable) {
-                                    Log.d("error -> ", e.localizedMessage ?: "error")
-                                }
-                            }
-                            )
-                        )
-                    }
                     login()
                 }
 
@@ -82,6 +66,20 @@ class RegisterPresenter(_ctx: Activity) {
                         val string = response.body()?.string()
                         val json = Gson().fromJson(string, JsonObject::class.java)
                         UserInstance.session = response.headers().get("Set-Cookie")
+
+                        for(p in UserInstance.userPhotos) {
+                            composite.add(
+                                api.addPhoto(p).subscribeOn(
+                                    Schedulers.io()
+                                ).observeOn(AndroidSchedulers.mainThread()
+                                ).subscribeWith(object: DisposableSingleObserver<ResponseBody>() {
+                                    override fun onSuccess(t: ResponseBody) {}
+                                    override fun onError(e: Throwable) {}
+                                }
+                                )
+                            )
+                        }
+
                         e.putString(
                             "session",
                             UserInstance.session ?: response.headers().get("Set-Cookie")
@@ -111,7 +109,6 @@ class RegisterPresenter(_ctx: Activity) {
                             Toast.LENGTH_LONG
                         ).show()
                 }
-
             })
         )
     }

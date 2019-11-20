@@ -6,10 +6,6 @@
             <stroke android:color="@color/colorGrey4" android:width="2dp"/>
         </shape>
     </item>
-    <!--
-        hide left, top and right side border using white color
-        by padding 4 dp bottom side
-    -->
     <item android:bottom="2dp">
         <shape android:shape="rectangle">
             <solid android:color="@color/colorBackground"/>

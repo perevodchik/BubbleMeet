@@ -1,6 +1,7 @@
 package com.perevodchik.bubblemeet.util
 
 import android.content.Context
+import android.util.Log
 import com.perevodchik.bubblemeet.data.model.ChatItem
 import com.perevodchik.bubblemeet.data.model.Message
 import com.perevodchik.bubblemeet.data.model.Profile
@@ -185,9 +186,6 @@ class Api() {
 
     fun deleteFavorite(id: Int): Single<ResponseBody> {
         val api: IApi = r.create(IApi::class.java)
-        val session = UserInstance.session ?: ""
-        // RequestBody.create(MediaType.parse(textPlain), id.toString())
-//        session, RequestBody.create(MediaType.parse(textPlain),
         return api.deleteFavorite(id.toString())
     }
 

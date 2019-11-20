@@ -33,7 +33,7 @@ class NewMatches(_ctx: Context, _list: MutableList<UserData>): Fragment() {
     private lateinit var avatar0: ImageView
     private lateinit var avatar1: ImageView
     private lateinit var toggle: ImageView
-    private lateinit var sendBtn: Button
+    private lateinit var sendBtn: ImageView
     private lateinit var messageText: EditText
 
     @SuppressLint("SetTextI18n")
@@ -49,7 +49,6 @@ class NewMatches(_ctx: Context, _list: MutableList<UserData>): Fragment() {
         toggle.setOnClickListener { nextUser() }
 
         messageText = v.findViewById(R.id.first_message_text)
-
 
         sendBtn = v.findViewById(R.id.send_first_message)
         sendBtn.setOnClickListener {

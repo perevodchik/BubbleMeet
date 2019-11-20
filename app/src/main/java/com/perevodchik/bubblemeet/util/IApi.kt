@@ -137,9 +137,6 @@ interface IApi {
     /**
      * delete the user favorite by id
      */
-    //@DELETE("favorite")
-    //@Multipart
-//    @Header("Cookie") session: String,
     @FormUrlEncoded
     @HTTP(method = "DELETE", path = "favorite", hasBody = true)
     fun deleteFavorite(@Field("id") id: String): Single<ResponseBody>
