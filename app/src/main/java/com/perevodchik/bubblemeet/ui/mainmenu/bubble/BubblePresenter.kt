@@ -3,6 +3,7 @@ package com.perevodchik.bubblemeet.ui.mainmenu.bubble
 import android.util.Log
 import com.perevodchik.bubblemeet.data.model.UserData
 import com.perevodchik.bubblemeet.util.Api
+import com.perevodchik.bubblemeet.util.Location
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
@@ -85,6 +86,10 @@ class BubblePresenter(_ctx: BubbleFragment) {
     fun filterByLocation(list: MutableList<UserData>, value: String): MutableList<UserData> {
         if(value.contains("all", true) || value.contains("area", true) || value.equals("null", true))
             return list
+
+        val c = Location.getCoordinates()
+        if (c != null)
+            UserInstance.profile.location = "${c.latitude},${c.longitude}"
 
         val iterator = list.iterator()
         val arr = value.split(" ")

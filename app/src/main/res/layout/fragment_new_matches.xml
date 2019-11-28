@@ -8,6 +8,16 @@
     android:paddingStart="30dp"
     android:paddingEnd="30dp">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/match"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.266"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/input_element" />
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/match_image0"
         android:layout_width="125dp"
@@ -19,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:svg_raw_resource="@raw/like"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="244dp" />
+        tools:layout_editor_absoluteY="190dp" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/match_image1"
@@ -32,24 +42,13 @@
         app:layout_constraintStart_toEndOf="@+id/match_image0"
         app:svg_raw_resource="@raw/like"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="244dp" />
-
-
-    <!--    <ImageView-->
-    <!--        android:id="@+id/imageView3"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="100dp"-->
-    <!--        android:layout_marginTop="60dp"-->
-    <!--        android:src="@color/colorAccent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/input_element"-->
-    <!--        tools:ignore="ContentDescription"-->
-    <!--        tools:layout_editor_absoluteX="16dp" />-->
+        tools:layout_editor_absoluteY="190dp" />
 
     <LinearLayout
         android:id="@+id/input_element"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="28dp"
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@+id/match_image0"
         tools:layout_editor_absoluteX="30dp">
@@ -77,17 +76,5 @@
             app:layout_constraintTop_toBottomOf="@+id/first_message_text" />
 
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/match"
-        android:textColor="@color/colorGrey"
-        android:textSize="60sp"
-        android:layout_marginTop="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_element" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

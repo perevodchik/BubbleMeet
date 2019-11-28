@@ -12,7 +12,7 @@ class Location {
 
     companion object {
         @SuppressLint("StaticFieldLeak")
-        private lateinit  var gpsTracker: GpsTracker
+        lateinit  var gpsTracker: GpsTracker
 
         fun initTracker(activity: Activity) {
             gpsTracker = GpsTracker(activity)

@@ -16,7 +16,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.perevodchik.bubblemeet.R
 import com.perevodchik.bubblemeet.custom.Bubble
-import com.perevodchik.bubblemeet.data.AnimateWrapper
 import com.perevodchik.bubblemeet.data.model.UserData
 import com.perevodchik.bubblemeet.ui.filter.FilterActivity
 import com.perevodchik.bubblemeet.ui.user.UserPreviewFragment
@@ -29,11 +28,7 @@ import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
 import java.util.*
-import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.roundToInt
-import kotlin.math.sqrt
-import kotlin.random.Random
+import kotlin.math.*
 
 class BubbleFragment : Fragment() {
     private lateinit var grid: AbsoluteLayout
@@ -51,12 +46,7 @@ class BubbleFragment : Fragment() {
     private val display by lazy { activity!!.windowManager.defaultDisplay }
     /** default (start and max) bubble size */
     //private val defaultBubbleSize by lazy { Math.dpToPixel(200.0f, context!!).roundToInt() }
-    private val defaultBubbleSize by lazy {
-        (Math.dpToPixel(
-            size.x / 6.0f,
-            context!!
-        )).roundToInt()
-    }
+    private var defaultBubbleSize: Int = 0
     /** center of the screen */
     private val center by lazy { Point(size.x / 2, size.y / 2) }
     /** point with coordinates where user up finger */
@@ -86,14 +76,16 @@ class BubbleFragment : Fragment() {
 
     private var isInertialMove = false
     private var isSlowed = false
-    private var inertialX: Int = 0
-    private var inertialY: Int = 0
+    private var inertialX: Int = -5
+    private var inertialY: Int = -5
 
     private var isFirstLoad = true
+    private var bubbleDelimeter: Float = 0.0f
+    private var distanceDelimeter: Int = 1000
 
     companion object {
-        private const val minScaleMultiplier: Float = 0.02f
-        private const val maxScaleMultiplier: Float = 1.25f
+        private const val minScaleMultiplier: Float = 0.025f
+        private const val maxScaleMultiplier: Float = 0.8f
         private const val borderMultiplier = 5
         private const val inertiaScale = 1
         private val users: MutableList<UserData> = mutableListOf()
@@ -108,16 +100,48 @@ class BubbleFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         return inflater.inflate(R.layout.fragment_bubble_grid0, null)
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d("steep", "onViewCreated")
         grid = activity!!.findViewById(R.id.grid_bubbles)
         grid.setOnTouchListener(getTouchListener())
         display.getSize(size)
+        Log.d("screen size => ", "$size")
+
+        bubbleDelimeter = when(Math.pixelsToDp(size.x + 0f, context!!).roundToInt()) {
+            in 100..200 -> 10.5f
+            in 200..300 -> 8.5f
+            in 300..400 -> 5.25f
+            in 400..500 -> 5.5f
+            in 500..550 -> 5.0f
+            in 550..600 -> 4.5f
+            in 600..700 -> 4.0f
+            in 700..800 -> 3.5f
+            else -> 2.75f
+        }
+        distanceDelimeter = when(Math.pixelsToDp(size.x + 0f, context!!).roundToInt()) {
+            in 100..200 -> 450
+            in 200..300 -> 500
+            in 300..400 -> 600
+            in 400..800 -> 1000
+//            in 500..550 -> 900
+//            in 550..600 -> 800
+//            in 600..700 -> 700
+//            in 700..800 -> 600
+            else -> 1000
+        }
+
+        Log.d("bubbleDelimeter =>", "$bubbleDelimeter")
+        Log.d("distanceDelimeter =>", "$distanceDelimeter")
+
+        defaultBubbleSize = (Math.dpToPixel(
+            size.x / bubbleDelimeter,
+            context!!
+        )).roundToInt()
 
         fetch()
         toggle()
@@ -131,7 +155,7 @@ class BubbleFragment : Fragment() {
         val list = mutableListOf<UserData>()
         list.addAll(UserInstance.allUsers)
 
-        if(UserInstance.filters.size == 0 && list.size == 0)
+        if (UserInstance.filters.size == 0 && list.size == 0)
             return
 
         presenter.filterByGender(list, UserInstance.filters["gender"] ?: "null")
@@ -164,18 +188,20 @@ class BubbleFragment : Fragment() {
      */
     private fun checkLeftBorder(isBig: Boolean): Boolean {
 
-        if(((objLeftTop.x + objLeftTop.width > defaultBubbleSize / borderMultiplier && !isBig) || (objLeftTop.x > size.x && isBig)) && !isInertialMoveFromLeft) {
-            isBreakMoving = true
-            isInertialMove = false
+        if (((objLeftTop.x + objLeftTop.width > defaultBubbleSize / borderMultiplier && !isBig) || (objLeftTop.x > size.x && isBig)) && !isInertialMoveFromLeft) {
+//            isBreakMoving = true
+//            isInertialMove = false
             isInertialMoveFromLeft = true
 
             checkTopBorder(isBig)
             checkBottomBorder(isBig)
 
-            for (b in bubbles) {
-                b.animateWrapper.params(100.0f)
-                b.animateWrapper.setX(b.view.x - objLeftTop.x - objLeftTop.width)
-            }
+            inertialX = -3
+
+//            for (b in bubbles) {
+//                b.animateWrapper.params(100.0f)
+//                b.animateWrapper.setX(b.view.x - objLeftTop.x - objLeftTop.width)
+//            }
         }
         return isInertialMoveFromLeft
     }
@@ -185,17 +211,20 @@ class BubbleFragment : Fragment() {
      */
     private fun checkTopBorder(isBig: Boolean): Boolean {
         if (((objLeftTop.y > defaultBubbleSize / borderMultiplier && !isBig) || (objRight.y > size.y / 2 && isBig)) && !isInertialMoveFromTop) {
-            isBreakMoving = true
-            isInertialMove = false
+//            isBreakMoving = true
+//            isInertialMove = false
             isInertialMoveFromTop = true
 
             checkLeftBorder(isBig)
             checkRightBorder(isBig)
 
-            for (b in bubbles) {
-                b.animateWrapper.params(100.0f)
-                b.animateWrapper.setY(b.view.y - objLeftTop.y - objLeftTop.height)
-            }
+            if(inertialY > 0)
+                inertialY = -3
+
+//            for (b in bubbles) {
+//                b.animateWrapper.params(100.0f)
+//                b.animateWrapper.setY(b.view.y - objLeftTop.y - objLeftTop.height)
+//            }
         }
         return isInertialMoveFromTop
     }
@@ -205,18 +234,20 @@ class BubbleFragment : Fragment() {
      * check is bubble`s out of the right border
      */
     private fun checkRightBorder(isBig: Boolean): Boolean {
-        if(((objRight.x < size.x - defaultBubbleSize / borderMultiplier && !isBig) || (objRight.x < size.x / 2 && isBig)) && !isInertialMoveFromRight) {
-            isBreakMoving = true
-            isInertialMove = false
+        if (((objRight.x < size.x - defaultBubbleSize / borderMultiplier && !isBig) || (objRight.x < size.x / 2 && isBig)) && !isInertialMoveFromRight) {
+//            isBreakMoving = true
+//            isInertialMove = false
             isInertialMoveFromRight = true
 
             checkTopBorder(isBig)
             checkBottomBorder(isBig)
 
-            for (b in bubbles) {
-                b.animateWrapper.params(100.0f)
-                b.animateWrapper.setX(b.view.x + size.x - objRight.x)
-            }
+            inertialX = 3
+
+//            for (b in bubbles) {
+//                b.animateWrapper.params(100.0f)
+//                b.animateWrapper.setX(b.view.x + size.x - objRight.x)
+//            }
         }
         return isInertialMoveFromRight
     }
@@ -226,18 +257,21 @@ class BubbleFragment : Fragment() {
      * check is bubble`s out of the bottom border
      */
     private fun checkBottomBorder(isBig: Boolean): Boolean {
-        if(((objBottom.y < size.y - (size.y / borderMultiplier) && !isBig) || (objBottom.y < size.y / 2 && isBig)) && !isInertialMoveFromBottom) {
-            isBreakMoving = true
-            isInertialMove = false
+        if (((objBottom.y < size.y - (size.y / borderMultiplier) && !isBig) || (objBottom.y < size.y / 2 && isBig)) && !isInertialMoveFromBottom) {
+//            isBreakMoving = true
+//            isInertialMove = false
             isInertialMoveFromBottom = true
 
             checkLeftBorder(isBig)
             checkRightBorder(isBig)
 
-            for (b in bubbles) {
-                b.animateWrapper.params(100.0f)
-                b.animateWrapper.setY(b.view.y + size.y - objBottom.y - objBottom.height)
-            }
+            if(inertialY < 0)
+                inertialY = 3
+
+//            for (b in bubbles) {
+//                b.animateWrapper.params(100.0f)
+//                b.animateWrapper.setY(b.view.y + size.y - objBottom.y - objBottom.height)
+//            }
         }
         return isInertialMoveFromBottom
     }
@@ -249,13 +283,8 @@ class BubbleFragment : Fragment() {
                 isY = isInertialMoveFromTop || isInertialMoveFromBottom
             )
 
-        Log.d("isInertialMoveFromLeft", "$isInertialMoveFromLeft")
-        Log.d("isInertialMoveFromTop", "$isInertialMoveFromTop")
-        Log.d("isInertialMoveFromRight", "$isInertialMoveFromRight")
-        Log.d("isInertialMoveFromBotom", "$isInertialMoveFromBottom")
-
-        isInertialMove = false
-        isSlowed = false
+//        isInertialMove = false
+//        isSlowed = false
         isInertialMoveFromLeft = false
         isInertialMoveFromTop = false
         isInertialMoveFromRight = false
@@ -281,6 +310,8 @@ class BubbleFragment : Fragment() {
      * and blocking user permission to move grid with finger for 500 millis
      */
     private fun validatePositionAtBorder(isBig: Boolean) {
+        if(bubbles.size < 30)
+            return
         if (checkLeftBorder(isBig) || checkTopBorder(isBig) ||
             checkRightBorder(isBig) || checkBottomBorder(isBig)
         ) moveFromBorder()
@@ -290,7 +321,7 @@ class BubbleFragment : Fragment() {
     private fun checkIsUser(e: MotionEvent) {
         val x = e.x.toDouble()
         val y = e.y.toDouble()
-        for(b in bubbles) {
+        for (b in bubbles) {
             val d = b.view.x.toDouble()
             val d2 = defaultBubbleSize.toDouble()
             val d3 = 1.0 - getScaleSize(b)
@@ -298,7 +329,6 @@ class BubbleFragment : Fragment() {
             if (x > d + d4 && y > b.view.y) {
                 val d5 = (b.view.x + b.view.height).toDouble() - 100
                 val d6 = defaultBubbleSize.toDouble()
-//                val d7 = 1.0 - getScaleSize(b)
                 val d7 = b.scaleSize
                 val d8 = d6 * d7 / 2.0
                 if (x < d5 + d8 && e.y < (b.view.y + b.view.height)) {
@@ -309,7 +339,7 @@ class BubbleFragment : Fragment() {
                         ?.replace(R.id.container, UserPreviewFragment(b.userData, fm))
                         ?.addToBackStack(null)
                         ?.commit()
-                    for(bubble in bubbles)
+                    for (bubble in bubbles)
                         bubble.animateWrapper.stopAnimation()
                     return
                 }
@@ -374,14 +404,13 @@ class BubbleFragment : Fragment() {
                         startClickMillis = Calendar.getInstance().timeInMillis
                     }
                     1 -> {
-                        if(Calendar.getInstance().timeInMillis - startClickMillis < 75) {
-                            if(!isOpenedUser)
+                        if (Calendar.getInstance().timeInMillis - startClickMillis < 75) {
+                            if (!isOpenedUser)
                                 checkIsUser(e)
                         }
                         if (Calendar.getInstance().timeInMillis - lastMoveMillis < 20) {
                             startInertial()
                         }
-                        //validatePositionAtBorder(true)
                         endClickMillis = Calendar.getInstance().timeInMillis
                         return@OnTouchListener true
                     }
@@ -505,48 +534,41 @@ class BubbleFragment : Fragment() {
         var s =
             Point(
                 (o.view.x + o.view.width / 2).toInt(),
-                (o.view.y + o.view.height / 2).toInt() - 150 + defaultBubbleSize / 2
-            ).distance(center) / 1000
+                (o.view.y + o.view.height / 2).toInt() + 100
+            ).distance(center) / distanceDelimeter
+
+//        (o.view as TextView).text = s.toString()
+        if(s > 0.525) {
+            s = minScaleMultiplier
+            o.scaleSize = s
+            return s
+        }
+
         when {
             s > maxScaleMultiplier -> s = maxScaleMultiplier
             s < minScaleMultiplier -> s = minScaleMultiplier
-            else -> s += sqrt(s).pow(3)
+            else -> s += sqrt(s).pow(if(bubbleDelimeter > 5.0) 4 else 5)
         }
-
-        if(size.x < 900)
-            s /= 2
 
         s = 1 - s
         if (s < minScaleMultiplier)
             s = minScaleMultiplier
+
+        s = exp(s) - 0.85f
+
+        if(s < 0.27f) {
+            o.scaleSize = s
+            return s
+        }
+
+        when {
+            s > maxScaleMultiplier -> s = maxScaleMultiplier
+            s < minScaleMultiplier -> s = minScaleMultiplier
+        }
+        if(s > maxScaleMultiplier) s = maxScaleMultiplier
 
         o.scaleSize = s
-        return s
-    }
-
-    /**
-     * calculated and return the multiplier for scale view size
-     * @param view the view
-     * @return float value
-     */
-    private fun getScaleSize(view: View, point: Point): Float {
-        var s =
-            Point(
-                (point.x + view.width / 2 - 200),
-                (point.y + view.height / 2 - 200) + defaultBubbleSize / 2
-            ).distance(center) / 1000
-        when {
-            s > maxScaleMultiplier -> s = maxScaleMultiplier
-            s < minScaleMultiplier -> s = minScaleMultiplier
-            else -> s += sqrt(s).pow(3)
-        }
-
-        if(size.x < 900)
-            s /= 2
-
-        s = 1 - s
-        if (s < minScaleMultiplier)
-            s = minScaleMultiplier
+//        Log.d("distance3 => ", "${o.scaleSize}")
         return s
     }
 
@@ -561,13 +583,14 @@ class BubbleFragment : Fragment() {
                 if (animateId != _id)
                     return
                 val c = bubbles[i]
-                if (isViewShowOnScreen(c.view)) {
+                //if (isViewShowOnScreen(c.view)) {
                     val startScale = getScaleSize(c)
+
                     c.scaleSize = startScale
                     c.animateWrapper.scale(startScale)
                     c.animateWrapper.startScaleAnimation()
 //                    (c.view as TextView).text = startScale.toString()
-                }
+                //}
             }
         }
     }
@@ -586,54 +609,9 @@ class BubbleFragment : Fragment() {
         }
     }
 
-    /**
-     * loop about all child of the grid
-     * scale child`s size without check if view show at the screen
-     */
-    private fun scale(b: Bubble, p: Point): Float {
-        val startScale = getScaleSize(b.view, p)
-        b.scaleSize = startScale
-        b.animateWrapper.scale(startScale)
-        b.animateWrapper.startScaleAnimation()
-//        (b.view as TextView).text = startScale.toString()
-        return startScale
-    }
-
-    /**
-     * return true if view shows at screen
-     * @param v the view
-     * @return the result
-     */
-    private fun isViewShowOnScreen(v: View): Boolean {
-        val x = v.x
-        val y = v.y
-        return x + defaultBubbleSize > 0 && x - defaultBubbleSize < size.x && y + defaultBubbleSize > 0 && y - defaultBubbleSize < size.y
-    }
-
-    /**
-     * called when user up finger from screen
-     * post runnable obj
-     * this obj will scale all grid child`s
-     */
-    private fun afterClickScale() {
-        val id = ++animateId
-        animateId = id
-        val myHandler = Handler()
-        myHandler.postDelayed(object : Runnable {
-            override fun run() {
-                if (Calendar.getInstance().timeInMillis - endClickMillis < 2500) {
-                    scale(id)
-                    validatePositionAtBorder(false)
-                    myHandler.postDelayed(this, 50)
-                }
-            }
-        }, 50)
-
-    }
-
     @SuppressLint("ClickableViewAccessibility", "InflateParams", "SetTextI18n")
     private fun init() {
-        if(isFirstLoad) {
+        if (isFirstLoad) {
             users.shuffle()
             isFirstLoad = false
         }
@@ -644,13 +622,14 @@ class BubbleFragment : Fragment() {
         for (i in 0 until users.size)
             points.add(Point())
 
+        val diff = 0 //if (size.x > 1000) 50 else 0
         // прорахування скільки пікселів потрібно для бульбашки
-        defSizeX = ((size.x / 2.45)).toInt() - 50
+        defSizeX = ((size.x / 2.45)).toInt() - diff
         defSizeY = (size.y / 4.9).toInt() - 50
         // прорахування загальну величину "холсту"
         sizeX = defSizeX * (rows - 1)
         sizeY = defSizeY * (rows - 1)
-        // прорахування стартові пікселі де будемо розміщувати бульбашки
+        // прорахування стартової позиції де будемо розміщувати бульбашки
         startX = 0 - (sizeX / 2)
         startY = 0 - (sizeY / 2)
 
@@ -658,7 +637,7 @@ class BubbleFragment : Fragment() {
             for (j in 0 until rows) {
                 if (activity == null)
                     return
-                if(!iter.hasNext())
+                if (!iter.hasNext())
                     return
 
                 val view = activity!!.layoutInflater.inflate(
@@ -672,8 +651,6 @@ class BubbleFragment : Fragment() {
                 val y = startY + defSizeY * i2
                 bubble.view.x = x + 0.0f
                 bubble.view.y = y + 0.0f
-                //bubble.view. = this@BubbleFragment.defaultBubbleSize
-                //bubble.view.width = this@BubbleFragment.defaultBubbleSize
                 val params = AbsoluteLayout.LayoutParams(
                     this@BubbleFragment.defaultBubbleSize,
                     this@BubbleFragment.defaultBubbleSize,
@@ -682,22 +659,22 @@ class BubbleFragment : Fragment() {
                 )
 
                 if (i2 % 2 != 0) {
-                    bubble.view.x = bubble.view.x - (defSizeX / 2 + 0.0f)
+                    bubble.view.x = bubble.view.x - (defSizeX / 2.0f)
                 }
 
                 bubble.view.layoutParams = params
-                scale(bubble, Point(bubble.view.x.roundToInt(), bubble.view.y.roundToInt()))
 //                (bubble.view as TextView).text = "${bubble.userData.name} -> ${counter++}"
 
                 //scale(bubble.view)
                 grid.addView(bubble.view)
                 bubbles.add(bubble)
+
+//                bubble.view.setOnClickListener { getScaleSize(bubble) }
                 bubble.animateWrapper.startAlphaAnimation()
             }
         }
-        scale()
 
-        if(grid.childCount == 0)
+        if (grid.childCount == 0)
             return
         // -> find the left, top, right and bottom elements
         objLeftTop = grid.getChildAt(0)
@@ -715,6 +692,12 @@ class BubbleFragment : Fragment() {
             Picasso.with(context!!).load("${Values.imgUrl}/${users[cc].avatarSmall}")
                 .into(bubble as CircleImageView)
         }
+        scale()
+        isInertialMove = true
+        if(bubbleDelimeter > 5.25)
+            startInertial()
+        else move()
+        scale(++animateId)
     }
 
     /**
