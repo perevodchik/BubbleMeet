@@ -65,7 +65,7 @@ class UserProfileActivity : AppCompatActivity() {
             val t = TextView(this)
             t.text = s
             t.textSize = 14.0F
-            t.setTextColor(ContextCompat.getColor(this, R.color.colorWhite))
+            t.setTextColor(ContextCompat.getColor(this, R.color.colorGrey4))
             t.layoutParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
             t.setPaddingRelative(dpToPx(20.0F), dpToPx(10.0F), dpToPx(20.0F), dpToPx(10.0F))
             t.margin(left = 5F, right = 5F, top = 5F)

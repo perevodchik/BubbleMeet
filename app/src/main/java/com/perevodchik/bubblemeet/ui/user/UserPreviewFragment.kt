@@ -46,7 +46,7 @@ class UserPreviewFragment(_userData: UserData, _fm: FragmentManager) : Fragment(
     private lateinit var shineButton: ShineButton
     private lateinit var toggleBtn: ImageView
     private var isUserFavorite = false
-    private var flag: Int = 0
+    private var flag: Int = 1
 
     companion object {
         fun newInstance(_userData: UserData, _fm: FragmentManager) = UserPreviewFragment(_userData, _fm)
@@ -145,7 +145,7 @@ class UserPreviewFragment(_userData: UserData, _fm: FragmentManager) : Fragment(
                 likeBtn.setImageDrawable(resources.getDrawable(R.drawable.likes_button_boom, null))
             else
                 likeBtn.setImageDrawable(resources.getDrawable(R.drawable.likes_button_profile, null))
-            flag = 1
+            flag++
 
             if(isUserFavorite)
                 likeBtn.startAnimation(anim)
@@ -210,7 +210,7 @@ class UserPreviewFragment(_userData: UserData, _fm: FragmentManager) : Fragment(
 
     override fun onStop() {
         super.onStop()
-        if(flag == 0)
+        if(flag % 2 == 1)
             return
 
         when(isUserFavorite) {

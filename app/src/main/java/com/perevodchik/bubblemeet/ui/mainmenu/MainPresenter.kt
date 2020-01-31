@@ -16,6 +16,7 @@ import com.perevodchik.bubblemeet.ui.filter.FilterActivity
 import com.perevodchik.bubblemeet.ui.mainmenu.bubble.BubbleFragment
 import com.perevodchik.bubblemeet.ui.mainmenu.fragment.*
 import com.perevodchik.bubblemeet.ui.mainmenu.inbox.InboxFragment
+import com.perevodchik.bubblemeet.ui.newmatches.NewMatches
 import com.perevodchik.bubblemeet.ui.userprofile.UserProfileActivity
 import com.perevodchik.bubblemeet.util.Api
 import com.perevodchik.bubblemeet.util.Values
@@ -166,10 +167,20 @@ class MainPresenter(_ctx: MainActivity): View.OnClickListener,
                     .commit()
             }
             R.id.toggle -> {
-                context.startActivityForResult(Intent(context, FilterActivity::class.java), 33)
+//                context.startActivityForResult(Intent(context, FilterActivity::class.java), 33)
+                fragment = NewMatches(context, UserInstance.userLikes)
+                fm.beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .addToBackStack(null)
+                    .commit()
             }
             R.id.main_menu_user_avatar -> {
                 context.startActivity(Intent(context, UserProfileActivity::class.java))
+//                fragment = NewMatches(context, UserInstance.userLikes)
+//                fm.beginTransaction()
+//                    .replace(R.id.container, fragment)
+//                    .addToBackStack(null)
+//                    .commit()
             }
         }
     }

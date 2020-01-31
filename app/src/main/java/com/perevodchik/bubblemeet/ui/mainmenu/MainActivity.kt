@@ -5,8 +5,11 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.perevodchik.bubblemeet.R
+import com.perevodchik.bubblemeet.ui.filter.FilterActivity
 import com.perevodchik.bubblemeet.ui.mainmenu.bubble.BubbleFragment
 import com.perevodchik.bubblemeet.ui.mainmenu.presenter.LikesPresenter
 import com.perevodchik.bubblemeet.util.Location
@@ -14,6 +17,7 @@ import com.perevodchik.bubblemeet.util.UserInstance
 
 class MainActivity : AppCompatActivity() {
     private lateinit var presenter: MainPresenter
+    private lateinit var toggle: ImageView
 
     companion object {
         val PERMISSIONS_STORAGE = arrayOf(

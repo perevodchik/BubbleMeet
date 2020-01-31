@@ -79,4 +79,6 @@
     <string name="send_message">Enter your message</string>
     <string name="select_photo">Select photo</string>
     <string name="match">Match!</string>
+    <string name="fitofan">Fitofan media inc.</string>
+    <string name="profile_bubbles">profile_bubbles</string>
 </resources>

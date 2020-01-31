@@ -1,17 +1,14 @@
 package com.perevodchik.bubblemeet.ui.filter
 
 import android.app.Activity
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.RadioGroup
 import androidx.core.content.ContextCompat
 import com.perevodchik.bubblemeet.R
 import com.perevodchik.bubblemeet.custom.Radio
-import com.perevodchik.bubblemeet.data.model.Filter
 import com.perevodchik.bubblemeet.util.UserInstance
 import com.perevodchik.bubblemeet.util.dpToPx
 

@@ -82,6 +82,10 @@ class UserPreviewPresenter(_ctx: UserPreviewFragment) {
                 .subscribeWith(object: DisposableSingleObserver<ResponseBody>() {
                     override fun onSuccess(r: ResponseBody) {
                         val json = Gson().fromJson(r.string(), JsonObject::class.java)
+                        for(u in UserInstance.userLikes) {
+                            if(u.id == userData.id)
+                                return
+                        }
                         userData.id_favorite = json.get("favorite").asJsonObject.get("id").asInt
                         UserInstance.userLikes.add(userData)
                     }
@@ -98,6 +102,12 @@ class UserPreviewPresenter(_ctx: UserPreviewFragment) {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object: DisposableSingleObserver<ResponseBody>() {
                     override fun onSuccess(r: ResponseBody) {
+                        for(u in UserInstance.userLikes) {
+                            if(u.id == userData.id) {
+                                UserInstance.userLikes.remove(u)
+                                break
+                            }
+                        }
                         println(r.string())
                     }
                     override fun onError(e: Throwable) {

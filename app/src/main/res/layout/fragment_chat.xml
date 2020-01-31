@@ -10,7 +10,7 @@
         android:id="@+id/inbox_header"
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:background="@color/colorLightPurple1"
+        android:background="@color/colorBackground"
         android:orientation="horizontal"
         android:paddingStart="10dp"
         android:paddingTop="5dp"
@@ -73,9 +73,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorLightPurple1"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:background="@color/colorBackground"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -83,8 +83,8 @@
 
         <EditText
             android:id="@+id/input_message_text"
-            android:layout_width="340dp"
-            android:layout_height="70dp"
+            android:layout_width="300dp"
+            android:layout_height="60dp"
             android:background="@drawable/input_message_text_background"
             android:hint="@string/send_message"
             android:paddingStart="10dp"
@@ -99,8 +99,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/send_message"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_alignParentEnd="true"
             android:background="@drawable/white_circle_background"
             android:padding="5dp"

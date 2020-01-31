@@ -36,17 +36,21 @@
             android:id="@+id/toggle"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:contentDescription="@string/find_btn"
             android:src="@drawable/filter_btn"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+<!--        android:src="@drawable/filter_btn"-->
+
         <ImageView
             android:id="@+id/main_menu_logo"
             android:layout_width="120dp"
             android:layout_height="40dp"
+            android:layout_marginTop="10dp"
             android:contentDescription="@string/main_menu_logo"
             android:src="@drawable/bubble_logo_main_menu"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -59,8 +63,9 @@
             android:id="@+id/main_menu_user_avatar"
             android:layout_width="42dp"
             android:layout_height="42dp"
-            android:layout_marginEnd="5dp"
-            android:background="@drawable/preview_profile_avatar_background"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/preview_profile_avatar_background_yellow"
             android:padding="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -75,17 +80,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_editor_absoluteX="-16dp">
 
-        <View
-            android:id="@+id/imageView2"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginTop="4dp"
-            android:background="@android:color/black"
-            android:contentDescription="@string/main_menu_line"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/menu_item" />
+<!--        <View-->
+<!--            android:id="@+id/imageView2"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="2dp"-->
+<!--            android:layout_marginTop="4dp"-->
+<!--            android:background="@android:color/black"-->
+<!--            android:contentDescription="@string/main_menu_line"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.5"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/menu_item" />-->
 
         <LinearLayout
             android:id="@+id/linearLayout3"
@@ -101,8 +106,8 @@
 
             <ImageView
                 android:id="@+id/matches_item"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:contentDescription="@string/matches"
                 android:src="@drawable/ic_matches_inactive" />
 
@@ -130,8 +135,8 @@
 
             <ImageView
                 android:id="@+id/likes_item"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:contentDescription="@string/likes"
                 android:src="@drawable/ic_likes_inactive" />
 
@@ -147,8 +152,8 @@
 
         <ImageView
             android:id="@+id/menu_item"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
             android:layout_marginBottom="12dp"
             android:contentDescription="@string/main_menu_btn"
             android:src="@drawable/main_menu_button"
@@ -172,8 +177,8 @@
 
             <ImageView
                 android:id="@+id/watchers_item"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:contentDescription="@string/watchers"
                 android:src="@drawable/ic_watchers_inactive"/>
 
@@ -202,8 +207,8 @@
 
             <ImageView
                 android:id="@+id/inbox_item"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:contentDescription="@string/inbox"
                 android:src="@drawable/ic_inbox_inactive"/>
 

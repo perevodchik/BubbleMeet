@@ -14,6 +14,7 @@ import android.widget.AbsoluteLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.perevodchik.bubblemeet.R
 import com.perevodchik.bubblemeet.custom.Bubble
 import com.perevodchik.bubblemeet.data.model.UserData
@@ -88,6 +89,8 @@ class BubbleFragment : Fragment() {
         private const val maxScaleMultiplier: Float = 0.8f
         private const val borderMultiplier = 5
         private const val inertiaScale = 1
+        private const val borderMinus = -15
+        private const val borderPlus= 15
         private val users: MutableList<UserData> = mutableListOf()
         private var bubbles: MutableList<Bubble> = mutableListOf()
 
@@ -176,8 +179,10 @@ class BubbleFragment : Fragment() {
     }
 
     private fun toggle() {
+        print("main on start")
         val bToggle = activity?.findViewById<ImageView>(R.id.toggle)
         bToggle?.setImageDrawable(resources.getDrawable(R.drawable.filter_btn, null))
+        bToggle?.visibility = View.VISIBLE
         bToggle?.setOnClickListener {
             activity?.startActivityForResult(Intent(activity, FilterActivity::class.java), 33)
         }
@@ -196,7 +201,7 @@ class BubbleFragment : Fragment() {
             checkTopBorder(isBig)
             checkBottomBorder(isBig)
 
-            inertialX = -3
+            inertialX = borderMinus
 
 //            for (b in bubbles) {
 //                b.animateWrapper.params(100.0f)
@@ -219,7 +224,7 @@ class BubbleFragment : Fragment() {
             checkRightBorder(isBig)
 
             if(inertialY > 0)
-                inertialY = -3
+                inertialY = borderMinus
 
 //            for (b in bubbles) {
 //                b.animateWrapper.params(100.0f)
@@ -242,7 +247,7 @@ class BubbleFragment : Fragment() {
             checkTopBorder(isBig)
             checkBottomBorder(isBig)
 
-            inertialX = 3
+            inertialX = borderPlus
 
 //            for (b in bubbles) {
 //                b.animateWrapper.params(100.0f)
@@ -266,7 +271,7 @@ class BubbleFragment : Fragment() {
             checkRightBorder(isBig)
 
             if(inertialY < 0)
-                inertialY = 3
+                inertialY = borderPlus
 
 //            for (b in bubbles) {
 //                b.animateWrapper.params(100.0f)
@@ -689,8 +694,10 @@ class BubbleFragment : Fragment() {
         // load avatarSmall into bubbles
         for (cc in 0 until grid.childCount) {
             val bubble = grid.getChildAt(cc)
-            Picasso.with(context!!).load("${Values.imgUrl}/${users[cc].avatarSmall}")
-                .into(bubble as CircleImageView)
+            Glide.with(context!!).load("${Values.imgUrl}/${users[cc].avatarSmall}").into(bubble as CircleImageView)
+            Log.d("load img $cc", "${Values.imgUrl}/${users[cc].avatarSmall}")
+//            Picasso.with(context!!).load("${Values.imgUrl}/${users[cc].avatarSmall}")
+//                .into(bubble as CircleImageView)
         }
         scale()
         isInertialMove = true

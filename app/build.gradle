@@ -60,7 +60,7 @@ dependencies {
     implementation 'com.google.android:flexbox:1.1.1'
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1"
 
     // https://mvnrepository.com/artifact/com.sackcentury/shinebutton
     implementation group: 'com.sackcentury', name: 'shinebutton', version: '1.0.0'
